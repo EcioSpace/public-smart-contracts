@@ -1,4 +1,17 @@
 # ECIO Space - Public Smart Contracts
+## Pre-Sale
+To support our community, we separate 75M tokens out of IDO pool to offer direct sale to our early community with a discount rate of 50%. Hence, the presale offer will be 0.004 BUSD per 1 ECIO.
+The qualifications for Presale participants will be categorized in 3 groups:
+- Top 500 earliest whitelist registration
+- Top 500 unique referral users within 6 days
+- Lucky draw of 1,000 addresses 
+
+Group 1 and Group 2 will be guaranteed to buy with a limit of 50,000 $ECIO per user. 
+Group 3 will not be guaranteed to buy. The maximum purchase per user is limited to 50,000 $ECIO per user.
+#### Smart Contract Address: - (Under Testing)
+#### BSC Scan : - (Under Testing)
+#### Source code: [Presale.sol](contracts/Presale.sol)
+
 
 ## Token
 
