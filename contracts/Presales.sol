@@ -47,8 +47,8 @@ contract Presales is Ownable {
     }
     
     //Validate amount of buying to makesure that it not over maximun buying per account.
-    modifier isNotMaximumBuy(address _account, uint _amount){
-       require(accountBalances[_account] + _amount <= MAXIMUM_BUY ,"Over Maximum");
+    modifier isNotOverMaximum(address _account, uint _amount){
+       require(accountBalances[_account] + _amount <= MAXIMUM_BUY ,"Your amount is over maximun buying per account.");
         _;
     }
 
@@ -117,7 +117,7 @@ contract Presales is Ownable {
     /**
     * @dev a function for transfer BUSD token to this contract address and waiting for claim ECIO Token later.
     */
-    function buyPresale(address _account, uint _amount) external hasWhitelistRegistered(_account) isNotMaximumBuy(_account, _amount) isOpenPresale(_account) {
+    function buyPresale(address _account, uint _amount) external hasWhitelistRegistered(_account) isNotOverMaximum(_account, _amount) isOpenPresale(_account) {
        
         require(_amount > 0, "Your amount is too small.");
         
