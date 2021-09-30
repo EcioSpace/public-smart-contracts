@@ -10,7 +10,7 @@ Group 1 and Group 2 will be guaranteed to buy with a limit of 50,000 $ECIO per u
 Group 3 will not be guaranteed to buy. The maximum purchase per user is limited to 50,000 $ECIO per user.
 #### Smart Contract Address: - (Under Testing)
 #### BSC Scan : - (Under Testing)
-#### Source code: [Presale.sol](contracts/Presale.sol)
+#### Source code: [Presales.sol](contracts/Presales.sol)
 
 
 ## Token
