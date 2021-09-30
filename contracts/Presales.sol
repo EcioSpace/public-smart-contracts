@@ -46,9 +46,9 @@ contract Presales is Ownable {
         _;
     }
     
-    //Validate amount of buying to makesure that it not over maximun buying per account.
+    //Validate amount of buying to makesure that it not over maximum buying per account.
     modifier isNotOverMaximum(address _account, uint _amount){
-       require(accountBalances[_account] + _amount <= MAXIMUM_BUY ,"Your amount is over maximun buying per account.");
+       require(accountBalances[_account] + _amount <= MAXIMUM_BUY ,"Your amount is over maximum buying per account.");
         _;
     }
 
