@@ -1,4 +1,4 @@
-# Public smart contracts
+# Public Smart Contracts
 
 
 ## Token
