@@ -62,22 +62,30 @@ contract Presales is Ownable {
         _;
     }
 
+
+    /**
+    * @dev Balances of all lots. 
+    */
     function totalBalances() public view returns(uint) {
         return lotsBalances[LOT1] + lotsBalances[LOT2] + lotsBalances[LOT3];
     }
 
-
-    /// @param _lotId the new value to store
-    /// @param _startTime the new value to store
-    /// @param _endTime the new value to store
-    /// @dev setPresaleTime is function for setup pre-sale's timestamp.
+ 
+    /**
+    * @dev SetPresaleTime is function for setup pre-sale's timestamp.
+    * @param _lotId lotId of pre-sale
+    * @param _startTime start timestamp
+    * @param _endTime end timestamp
+    */
     function setPresaleTime(uint _lotId, uint _startTime, uint _endTime) external onlyOwner {
         lotsStartTime[_lotId] = _startTime;
         lotsEndTime[_lotId]   = _endTime;
     }
     
-    
-    //importWhitelist is function for manually import addresses that are allowed to buying. 
+
+    /**
+    * @dev ImportWhitelist is function for manually import addresses that are allowed to buying. 
+    */
     function importWhitelist(address[] memory _accounts, uint[] memory _lotIds) public onlyOwner {
         for(uint256 i = 0; i < _accounts.length; ++i){
             accountLotId[_accounts[i]] = _lotIds[i];
@@ -85,12 +93,17 @@ contract Presales is Ownable {
         }
     }
 
-    //show account's lotId
+    /**
+    * @dev Show account's lotId
+    */
     function lotId(address _account) public view returns(uint){
         return accountLotId[_account];
     }
 
-   //the number of tokens available for buying.
+
+    /**
+    * @dev The number of tokens available for buying.
+    */
     function tokenAvailable(address _account) public view returns(uint) {
         
         if(lotId(_account) == 0){
@@ -100,7 +113,10 @@ contract Presales is Ownable {
         return MAXIMUM_BUY - accountBalances[_account];
     }
 
-    // a function for transfer BUSD token to this contract address and waiting for claim ECIO Token later.
+
+    /**
+    * @dev a function for transfer BUSD token to this contract address and waiting for claim ECIO Token later.
+    */
     function buyPresale(address _account, uint _amount) external hasWhitelistRegistered(_account) isNotMaximumBuy(_account, _amount) isOpenPresale(_account) {
        
         require(_amount > 0, "Your amount is too small.");
@@ -131,14 +147,21 @@ contract Presales is Ownable {
 
     }
     
-    //contractBalances is function to show Token balance in smart contract. 
+
+    /**
+    * @dev ContractBalances is function to show Token balance in smart contract. 
+    */
     function contractBalances(address _contractAddress) public view returns(uint)  {
         IERC20 _token = IERC20(_contractAddress);
         uint256 _balance = _token.balanceOf(address(this));
         return _balance;
     }
     
-    //transfer is function to transfer token from contract to other account.
+
+    /**
+    * @dev Transfer is function to transfer token from contract to other account.
+    */
+
     function transfer(address _contractAddress, address  _to, uint _amount) public onlyOwner {
         IERC20 _token = IERC20(_contractAddress);
         _token.transfer(_to, _amount);
