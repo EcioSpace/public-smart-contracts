@@ -4,22 +4,19 @@ pragma solidity ^0.8.3;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-/// @author ECIO Engineer Team
-/// @title Pre-Sales Smart Contract
+/// @author ECIO Engineering Team
+/// @title Pre-Sale Smart Contract
 contract Presales is Ownable {
     
-    uint256 private constant LOT1 = 1;
-    uint256 private constant LOT2 = 2;
-    uint256 private constant LOT3 = 3;
+    uint256 private constant LOT1_LOT2 = 1;
+    uint256 private constant LOT3 = 2;
     
     //maximum BUSD per account.
-    uint256 private constant MAXIMUM_BUY  = 200000000000000000000;
-    
-    //maximum BUSD in presale. 
-    uint256 private constant MAXIMUM_BUSD = 300000000000000000000000;
+    uint256 private constant MAXIMUM_BUSD_PER_ACCOUNT  = 200000000000000000000;
     
     //BUSD token address.
-    address private constant BUSD_TOKEN_ADDRESS = 0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee; //Testnet
+    address private constant BUSD_TOKEN_ADDRESS =  0x2B2E131937845454b57920604977E0aBf43be58D;
+   // address private constant BUSD_TOKEN_ADDRESS = 0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee; //Testnet
     //address private constant BUSD_TOKEN_ADDRESS = 0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56; //Maintest
     
     //lotsStartTime is start timestamp of each pre-sale lot.
@@ -27,6 +24,9 @@ contract Presales is Ownable {
     
     //lotsEndTime is start timestamp of each pre-sale lot.
     mapping(uint => uint) public lotsEndTime;
+
+    //lotsTokenPool is total token of each pre-sale lot.
+    mapping(uint => uint) public lotsTokenPool;
     
     //accountBalances is user's balances BUSD Token.
     mapping(address => uint) public accountBalances;
@@ -37,23 +37,18 @@ contract Presales is Ownable {
     //lot's balances.
     mapping(uint => uint) public lotsBalances;
    
+   //BuyPresale Event
     event BuyPresale(address indexed _from, uint _amount);
    
     
     //Validate the account has registered or not ? 
     modifier hasWhitelistRegistered(address _account){
-        require(lotId(_account) != 0,"The account is not whitelist listed.");
+        require(lotId(_account) != 0, "The account is not whitelist listed.");
         _;
     }
     
-    //Validate amount of buying to makesure that it not over maximum buying per account.
-    modifier isNotOverMaximum(address _account, uint _amount){
-       require(accountBalances[_account] + _amount <= MAXIMUM_BUY ,"Your amount is over maximum buying per account.");
-        _;
-    }
-
     //Validate start and end timestamp to allow users to access buying function.
-    modifier isOpenPresale(address _account){
+    modifier isPresaleOpen(address _account){
         
        uint _lotId = accountLotId[_account];
        require(lotsStartTime[_lotId] !=0 && lotsEndTime[_lotId] !=0 ,"Pre-sale hasn't started.");
@@ -62,12 +57,11 @@ contract Presales is Ownable {
         _;
     }
 
-
     /**
-    * @dev Balances of all lots. 
+    * @dev token pool number of lots. 
     */
-    function totalBalances() public view returns(uint) {
-        return lotsBalances[LOT1] + lotsBalances[LOT2] + lotsBalances[LOT3];
+    function tokenPoolPerLot(uint _lotId) public view returns(uint) {
+        return lotsTokenPool[_lotId];
     }
 
  
@@ -77,11 +71,16 @@ contract Presales is Ownable {
     * @param _startTime start timestamp
     * @param _endTime end timestamp
     */
-    function setPresaleTime(uint _lotId, uint _startTime, uint _endTime) external onlyOwner {
+    function setPresaleTime(uint _lotId, uint _startTime, uint _endTime, uint _tokenPool) external onlyOwner {
         lotsStartTime[_lotId] = _startTime;
         lotsEndTime[_lotId]   = _endTime;
+        lotsTokenPool[_lotId] = _tokenPool;
     }
     
+    function moveTokenPoolFromLoT1Lot2ToLot3() public onlyOwner{
+        lotsTokenPool[LOT3] = lotsTokenPool[LOT3] + lotsTokenPool[LOT1_LOT2];
+        lotsTokenPool[LOT1_LOT2] = 0;
+    }
 
     /**
     * @dev ImportWhitelist is function for manually import addresses that are allowed to buying. 
@@ -100,40 +99,53 @@ contract Presales is Ownable {
         return accountLotId[_account];
     }
 
+    function tokenAvailableForBuying(address _account) private view returns(uint) {
+        return MAXIMUM_BUSD_PER_ACCOUNT - accountBalances[_account];
+    }
 
     /**
     * @dev The number of tokens available for buying.
     */
     function tokenAvailable(address _account) public view returns(uint) {
         
-        if(lotId(_account) == 0){
-            return  0;
-        }
+        uint _lotId = lotId(_account);
+        uint _available =  tokenAvailableForBuying(_account);
         
-        return MAXIMUM_BUY - accountBalances[_account];
+        if(_lotId == LOT1_LOT2){
+            return _available;
+
+        }else if(_lotId == LOT3){
+            if(lotsTokenPool[_lotId] >= MAXIMUM_BUSD_PER_ACCOUNT){
+                  return _available;
+            }else{
+
+                if(lotsTokenPool[_lotId] <= _available){
+                    return lotsTokenPool[_lotId];
+                }
+            }
+        }
+
+        return 0;
     }
 
 
     /**
     * @dev a function for transfer BUSD token to this contract address and waiting for claim ECIO Token later.
     */
-    function buyPresale(address _account, uint _amount) external hasWhitelistRegistered(_account) isNotOverMaximum(_account, _amount) isOpenPresale(_account) {
+    function buyPresale(address _account, uint _amount) external hasWhitelistRegistered(_account) isPresaleOpen(_account) {
        
         require(_amount > 0, "Your amount is too small.");
-        
+
         IERC20 _token = IERC20(BUSD_TOKEN_ADDRESS);
-        
         uint _balance = _token.balanceOf(msg.sender);
-        
         require(_balance >= _amount, "Your balance is insufficient.");
-        
-        
+
+
         uint _lotId = accountLotId[_account];
+        uint _available = tokenAvailable(_account);
+         
+        require(_amount <= _available, "the token pool is insufficient.");
        
-        if(_lotId == LOT3){
-           require(lotsBalances[_lotId] + _amount <= MAXIMUM_BUSD / 2,"");
-        }
-        
         //transfer token from user's account into this smart contract address.
         _token.transferFrom(msg.sender, address(this), _amount);
         
@@ -142,9 +154,11 @@ contract Presales is Ownable {
         
         //Increase lot's balances.
         lotsBalances[_lotId] = lotsBalances[_lotId] + _amount;
+
+       //Increase lot's TokenPool.
+        lotsTokenPool[_lotId] = lotsTokenPool[_lotId] - _amount;
         
         emit BuyPresale(msg.sender, _amount);
-
     }
     
 
@@ -166,4 +180,6 @@ contract Presales is Ownable {
         IERC20 _token = IERC20(_contractAddress);
         _token.transfer(_to, _amount);
     }
+
+
 }
