@@ -22,8 +22,8 @@ Currency for trading between stars, Ecio Token represents Government Token of th
 - Upgrade Rank of Space crew
 - Enhancement of weapon and equipment
 - Purchase Event Items 
-#### Smart Contract Address: 0x7ccaa62a2b7724198683f24a204d60a1d19278ba
-#### BSC Scan : https://bscscan.com/token/0x7ccaa62a2b7724198683f24a204d60a1d19278ba
+#### Smart Contract Address: 0x44Cf35278e75cb527801ac37CB766dCB83DBde0E
+#### BSC Scan : https://bscscan.com/token/0x44Cf35278e75cb527801ac37CB766dCB83DBde0E
 #### Source code: [EcioSpace.sol](contracts/EcioSpace.sol)
 
 ### Lakrima Token
