@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract EcioSpace is ERC20, ERC20Burnable, Ownable {
 
-    uint256 private constant TOTAL_SUPPLY = 10000 * 10**(6 + 18); // 10000M tokens
+    uint256 private constant TOTAL_SUPPLY = 7000 * 10**(6 + 18); // 7000M tokens
 
     constructor() ERC20("ECIO Space", "ECIO") {}
 
