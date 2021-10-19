@@ -1,18 +1,4 @@
 # ECIO Space - Public Smart Contracts
-## Pre-Sale
-To support our community, we separate 75M tokens out of IDO pool to offer direct sale to our early community with a discount rate of 50%. Hence, the presale offer will be 0.004 BUSD per 1 ECIO.
-The qualifications for Presale participants will be categorized in 3 groups:
-- Top 500 earliest whitelist registration
-- Top 500 unique referral users within 6 days
-- Lucky draw of 1,000 addresses 
-
-Group 1 and Group 2 will be guaranteed to buy with a limit of 50,000 $ECIO per user. 
-Group 3 will not be guaranteed to buy. The maximum purchase per user is limited to 50,000 $ECIO per user.
-#### Smart Contract Address: - (Under Testing)
-#### BSC Scan : - (Under Testing)
-#### Source code: [Presales.sol](contracts/Presales.sol)
-
-
 ## Token
 
 ### ECIO Token
@@ -22,8 +8,8 @@ Currency for trading between stars, Ecio Token represents Government Token of th
 - Upgrade Rank of Space crew
 - Enhancement of weapon and equipment
 - Purchase Event Items 
-#### Smart Contract Address: 0x7ccaa62a2b7724198683f24a204d60a1d19278ba
-#### BSC Scan : https://bscscan.com/token/0x7ccaa62a2b7724198683f24a204d60a1d19278ba
+#### Smart Contract Address: 0x44Cf35278e75cb527801ac37CB766dCB83DBde0E
+#### BSC Scan : https://bscscan.com/token/0x44Cf35278e75cb527801ac37CB766dCB83DBde0E
 #### Source code: [EcioSpace.sol](contracts/EcioSpace.sol)
 
 ### Lakrima Token
