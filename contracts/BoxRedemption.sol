@@ -20,7 +20,6 @@ contract BoxRedemption is Ownable {
     uint256 private constant CM_BOX = 0;
     uint256 private constant R_BOX = 1;
     uint256 private constant E_BOX = 2;
-
     uint256 private constant NFT_TYPE = 0; //Kingdom
     uint256 private constant KINGDOM = 1; //Kingdom
     uint256 private constant TRANING_CAMP = 2; //Training Camp
@@ -31,7 +30,6 @@ contract BoxRedemption is Ownable {
     uint256 private constant GENOME = 7; //Human Genome
     uint256 private constant WEAPON = 8; //Weapon
     uint256 private constant COMBAT_RANKS = 9; //Combat Ranks
-
     uint256 private constant BLUEPRINT_FRAGMENT_COMMON = 0;
     uint256 private constant BLUEPRINT_FRAGMENT_RARE = 1;
     uint256 private constant BLUEPRINT_FRAGMENT_EPIC = 2;
@@ -917,18 +915,40 @@ contract BoxRedemption is Ownable {
         } else if (digit == 7) {
             return ((_randomNumber % 100000000000000) / 1000000000000) % mod;
         } else if (digit == 8) {
-            return ((_randomNumber % 10000000000000000) / 100000000000000) % mod;
+            return
+                ((_randomNumber % 10000000000000000) / 100000000000000) % mod;
         } else if (digit == 9) {
             return
                 ((_randomNumber % 1000000000000000000) / 10000000000000000) %
                 mod;
         } else if (digit == 10) {
             return
-                ((_randomNumber % 100000000000000000000) / 1000000000000000000) %
-                mod;
+                ((_randomNumber % 100000000000000000000) /
+                    1000000000000000000) % mod;
         }
 
         return 0;
+    }
+
+    function extactDigit(uint256 _randomNumber)
+        internal
+        pure
+        returns (
+            Digit memory
+        )
+    {
+
+        Digit memory digit;
+        digit.digit1 = (_randomNumber % 100);
+        digit.digit2 = ((_randomNumber % 10000) / 100);
+        digit.digit3 = ((_randomNumber % 1000000) / 10000);
+        digit.digit4 = ((_randomNumber % 100000000) / 1000000);
+        digit.digit5 = ((_randomNumber % 10000000000) / 100000000);
+        digit.digit6 = ((_randomNumber % 1000000000000) / 10000000000);
+        digit.digit7 = ((_randomNumber % 100000000000000) / 1000000000000);
+        digit.digit8 = ((_randomNumber % 10000000000000000) /
+            100000000000000);
+        return digit;
     }
 
     function GenerateNFTCode(uint256 _randomNumber, uint256 _id)
@@ -936,7 +956,8 @@ contract BoxRedemption is Ownable {
         view
         returns (string memory)
     {
-        uint256 nftTypeCode = GetRandomNumberWithMod(_randomNumber, 1, 7);
+        uint256 randomNFTType = GetRandomNumberWithMod(_randomNumber, 1, 20);
+        uint256 nftTypeCode = NFTPool[_id][randomNFTType];
         string memory partCode;
 
         if (nftTypeCode == BLUEPRINT_FRAGMENT_COMMON) {
@@ -1058,69 +1079,86 @@ contract BoxRedemption is Ownable {
                 nftTypeCode
             );
         } else if (nftTypeCode == SPACE_WARRIOR) {
-            uint256 kingdomCode = 0; //fix first kingdom only
-            uint256 combatRanksCode = 0; //fix
-            uint256 trainingCode;
-            uint256 battleGearCode;
-            uint256 battleDroneCode;
-            uint256 battleSuiteCode;
-            uint256 battleBotCode;
-            uint256 humanGenomeCode;
-            uint256 weaponCode;
-            uint256 equipmentTypeId = 0; //Default
-
-            if (_id == CM_BOX) {
-                trainingCode = GetRandomNumberWithMod(_randomNumber, 2, 5);
-                battleGearCode = GetRandomNumberWithMod(_randomNumber, 3, 30);
-                battleDroneCode = GetRandomNumberWithMod(_randomNumber, 4, 30);
-                battleSuiteCode = GetRandomNumberWithMod(_randomNumber, 5, 18);
-                battleBotCode = GetRandomNumberWithMod(_randomNumber, 6, 30);
-                humanGenomeCode = GetRandomNumberWithMod(_randomNumber, 7, 28);
-                weaponCode = GetRandomNumberWithMod(_randomNumber, 8, 29);
-            } else if (_id == R_BOX) {
-                trainingCode = GetRandomNumberWithMod(_randomNumber, 2, 5);
-                battleGearCode = GetRandomNumberWithMod(_randomNumber, 3, 30);
-                battleDroneCode = GetRandomNumberWithMod(_randomNumber, 4, 30);
-                battleSuiteCode = GetRandomNumberWithMod(_randomNumber, 5, 19);
-                battleBotCode = GetRandomNumberWithMod(_randomNumber, 6, 30);
-                humanGenomeCode = GetRandomNumberWithMod(_randomNumber, 7, 25);
-                weaponCode = GetRandomNumberWithMod(_randomNumber, 8, 34);
-            } else if (_id == E_BOX) {
-                trainingCode = GetRandomNumberWithMod(_randomNumber, 2, 30);
-                battleGearCode = GetRandomNumberWithMod(_randomNumber, 3, 30);
-                battleDroneCode = GetRandomNumberWithMod(_randomNumber, 4, 30);
-                battleSuiteCode = GetRandomNumberWithMod(_randomNumber, 5, 17);
-                battleBotCode = GetRandomNumberWithMod(_randomNumber, 6, 30);
-                humanGenomeCode = GetRandomNumberWithMod(_randomNumber, 7, 29);
-                weaponCode = GetRandomNumberWithMod(_randomNumber, 8, 32);
-            }
-
-            weaponCode = SWPool[WEAPON][_id][weaponCode];
-
-            humanGenomeCode = SWPool[GENOME][_id][humanGenomeCode]; //humanGenomeCode
-            battleBotCode = SWPool[BOT][_id][battleBotCode]; //battleBotCode
-            battleSuiteCode = SWPool[SUITE][_id][battleSuiteCode]; //battleSuiteCode
-            battleDroneCode = SWPool[DRONE][_id][battleDroneCode]; //battleDroneCode
-            battleGearCode = SWPool[GEAR][_id][battleGearCode]; //battleGearCode
-            trainingCode = SWPool[TRANING_CAMP][_id][trainingCode]; //trainingCode
-
-            string memory concatedCode = convertCodeToStr(nftTypeCode);
-            concatedCode = concateCode(concatedCode, kingdomCode);
-            concatedCode = concateCode(concatedCode, trainingCode);
-            concatedCode = concateCode(concatedCode, battleGearCode);
-            concatedCode = concateCode(concatedCode, battleDroneCode);
-            concatedCode = concateCode(concatedCode, battleSuiteCode);
-            concatedCode = concateCode(concatedCode, battleBotCode);
-            concatedCode = concateCode(concatedCode, humanGenomeCode);
-            concatedCode = concateCode(concatedCode, weaponCode);
-            concatedCode = concateCode(concatedCode, combatRanksCode);
-            concatedCode = concateCode(concatedCode, equipmentTypeId);
-            concatedCode = concateCode(concatedCode, 0); //Reserved
-            concatedCode = concateCode(concatedCode, 0); //Reserved
-            partCode = concatedCode;
+            partCode = createSW(_randomNumber, _id);
         }
 
         return partCode;
+    }
+
+    struct Digit {
+        uint256 digit1;
+        uint256 digit2;
+        uint256 digit3;
+        uint256 digit4;
+        uint256 digit5;
+        uint256 digit6;
+        uint256 digit7;
+        uint256 digit8;
+    }
+
+    function createSW(uint256 _random, uint256 _id)
+        private
+        view
+        returns (string memory)
+    {
+        Digit memory digit = extactDigit(_random);
+        uint256 kingdomCode = 0; //fix first kingdom only
+        uint256 combatRanksCode = 0; //fix
+        uint256 trainingCode;
+        uint256 battleGearCode;
+        uint256 battleDroneCode;
+        uint256 battleSuiteCode;
+        uint256 battleBotCode;
+        uint256 humanGenomeCode;
+        uint256 weaponCode;
+        uint256 equipmentTypeId = 0; //Default
+        if (_id == CM_BOX) {
+            trainingCode = digit.digit2 % 5;
+            battleGearCode = digit.digit3 % 30;
+            battleDroneCode = digit.digit4 % 30;
+            battleSuiteCode = digit.digit5 % 18;
+            battleBotCode = digit.digit6 % 30;
+            humanGenomeCode = digit.digit7 % 28;
+            weaponCode = digit.digit8 % 29;
+        } else if (_id == R_BOX) {
+            trainingCode = digit.digit2 % 5;
+            battleGearCode = digit.digit3 % 30;
+            battleDroneCode = digit.digit4 % 30;
+            battleSuiteCode = digit.digit5 % 19;
+            battleBotCode = digit.digit6 % 30;
+            humanGenomeCode = digit.digit7 % 25;
+            weaponCode = digit.digit8 % 34;
+        } else if (_id == E_BOX) {
+            trainingCode = digit.digit2 % 30;
+            battleGearCode = digit.digit3 % 30;
+            battleDroneCode = digit.digit4 % 30;
+            battleSuiteCode = digit.digit5 % 17;
+            battleBotCode = digit.digit6 % 30;
+            humanGenomeCode = digit.digit7 % 29;
+            weaponCode = digit.digit8 % 32;
+        }
+
+        weaponCode = SWPool[WEAPON][_id][weaponCode];
+        humanGenomeCode = SWPool[GENOME][_id][humanGenomeCode]; //humanGenomeCode
+        battleBotCode = SWPool[BOT][_id][battleBotCode]; //battleBotCode
+        battleSuiteCode = SWPool[SUITE][_id][battleSuiteCode]; //battleSuiteCode
+        battleDroneCode = SWPool[DRONE][_id][battleDroneCode]; //battleDroneCode
+        battleGearCode = SWPool[GEAR][_id][battleGearCode]; //battleGearCode
+        trainingCode = SWPool[TRANING_CAMP][_id][trainingCode]; //trainingCode
+        string memory concatedCode = convertCodeToStr(6);
+        concatedCode = concateCode(concatedCode, kingdomCode);
+        concatedCode = concateCode(concatedCode, trainingCode);
+        concatedCode = concateCode(concatedCode, battleGearCode);
+        concatedCode = concateCode(concatedCode, battleDroneCode);
+        concatedCode = concateCode(concatedCode, battleSuiteCode);
+        concatedCode = concateCode(concatedCode, battleBotCode);
+        concatedCode = concateCode(concatedCode, humanGenomeCode);
+        concatedCode = concateCode(concatedCode, weaponCode);
+        concatedCode = concateCode(concatedCode, combatRanksCode);
+        concatedCode = concateCode(concatedCode, equipmentTypeId);
+        concatedCode = concateCode(concatedCode, 0); //Reserved
+        concatedCode = concateCode(concatedCode, 0); //Reserved
+        return concatedCode;
     }
 
     function createBlueprintFragmentPartCode(
