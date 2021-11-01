@@ -1,13 +1,28 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.2;
 
-import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+// import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
+// import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+// import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
-interface ERC721_CONTRACT is IERC721 {
+interface ERC1155_CONTRACT {
+    function balanceOf(address account, uint256 id)
+        external
+        view
+        returns (uint256);
+
+    function safeMint(address to, string memory partCode) external;
+
+    function burn(
+        address account,
+        uint256 id,
+        uint256 value
+    ) external;
+}
+
+interface ERC721_CONTRACT {
     function safeMint(address to, string memory partCode) external;
 }
 
@@ -17,30 +32,30 @@ interface RANDOM_CONTRACT {
 
 contract BoxRedemption is Ownable {
     using Strings for string;
-    uint256 private constant CM_BOX = 0;
-    uint256 private constant R_BOX = 1;
-    uint256 private constant E_BOX = 2;
-    uint256 private constant NFT_TYPE = 0; //Kingdom
-    uint256 private constant KINGDOM = 1; //Kingdom
-    uint256 private constant TRANING_CAMP = 2; //Training Camp
-    uint256 private constant GEAR = 3; //Battle Gear
-    uint256 private constant DRONE = 4; //Battle Drone
-    uint256 private constant SUITE = 5; //Battle Suit
-    uint256 private constant BOT = 6; //Battle Bot
-    uint256 private constant GENOME = 7; //Human Genome
-    uint256 private constant WEAPON = 8; //Weapon
-    uint256 private constant COMBAT_RANKS = 9; //Combat Ranks
-    uint256 private constant BLUEPRINT_FRAGMENT_COMMON = 0;
-    uint256 private constant BLUEPRINT_FRAGMENT_RARE = 1;
-    uint256 private constant BLUEPRINT_FRAGMENT_EPIC = 2;
-    uint256 private constant GENOMIC_FRAGMENT_COMMON = 3;
-    uint256 private constant GENOMIC_FRAGMENT_RARE = 4;
-    uint256 private constant GENOMIC_FRAGMENT_EPIC = 5;
-    uint256 private constant SPACE_WARRIOR = 6;
+    uint8 private constant CM_BOX = 0;
+    uint8 private constant R_BOX = 1;
+    uint8 private constant E_BOX = 2;
+    uint8 private constant NFT_TYPE = 0; //Kingdom
+    uint8 private constant KINGDOM = 1; //Kingdom
+    uint8 private constant TRANING_CAMP = 2; //Training Camp
+    uint8 private constant GEAR = 3; //Battle Gear
+    uint8 private constant DRONE = 4; //Battle Drone
+    uint8 private constant SUITE = 5; //Battle Suit
+    uint8 private constant BOT = 6; //Battle Bot
+    uint8 private constant GENOME = 7; //Human Genome
+    uint8 private constant WEAPON = 8; //Weapon
+    uint8 private constant COMBAT_RANKS = 9; //Combat Ranks
+    uint8 private constant BLUEPRINT_FRAGMENT_COMMON = 0;
+    uint8 private constant BLUEPRINT_FRAGMENT_RARE = 1;
+    uint8 private constant BLUEPRINT_FRAGMENT_EPIC = 2;
+    uint8 private constant GENOMIC_FRAGMENT_COMMON = 3;
+    uint8 private constant GENOMIC_FRAGMENT_RARE = 4;
+    uint8 private constant GENOMIC_FRAGMENT_EPIC = 5;
+    uint8 private constant SPACE_WARRIOR = 6;
 
-    uint256 private constant COMMON = 0;
-    uint256 private constant RARE = 1;
-    uint256 private constant EPIC = 2;
+    uint8 private constant COMMON = 0;
+    uint8 private constant RARE = 1;
+    uint8 private constant EPIC = 2;
 
     //Testnet
     address public constant MISTORY_BOX_CONTRACT =
@@ -56,22 +71,24 @@ contract BoxRedemption is Ownable {
     // address public constant GALAXY_CONTRACT_EPIC = 0x9C90ba4C8834e92A771e4Fc0f486F1460e7b7a34;
 
     //Testnet
-    address public constant GALAXY_CONTRACT_CM = 0x80Bf5dbD599769Eb008a61da6a20a347db35Fd0e;
-    address public constant GALAXY_CONTRACT_RARE = 0x0253Bbd5874f775100BCec873383a2AfdA466273;
-    address public constant GALAXY_CONTRACT_EPIC = 0x36b6eA8bc7E0F4817D3b0212a6797E9b4316eC4C;
+    address public constant GAX_CM = 0x80Bf5dbD599769Eb008a61da6a20a347db35Fd0e;
+    address public constant GAX_RARE =
+        0x0253Bbd5874f775100BCec873383a2AfdA466273;
+    address public constant GAX_EPIC =
+        0x36b6eA8bc7E0F4817D3b0212a6797E9b4316eC4C;
 
-    mapping(uint256 => address) randomNumberToSender;
+    mapping(uint256 => address) ranNumToSender;
     mapping(uint256 => uint256) requestToNFTId;
 
     //NFTPool
     mapping(uint256 => mapping(uint256 => uint256)) public NFTPool;
 
-    //EquipmentPool
-    mapping(uint256 => uint256) public EquipmentPool;
+    //EPool
+    mapping(uint256 => uint256) public EPool;
 
     //BlueprintFragmentPool
     mapping(uint256 => mapping(uint256 => mapping(uint256 => mapping(uint256 => uint256))))
-        public BlueprintPool;
+        public BPPool;
 
     //GenomicPool
     mapping(uint256 => mapping(uint256 => mapping(uint256 => uint256)))
@@ -85,7 +102,7 @@ contract BoxRedemption is Ownable {
 
     constructor() {}
 
-    function initialMain() public onlyOwner {
+    function initial() public onlyOwner {
         //NFT Type
         // NFTPool[CM_BOX][0] = 0; //BLUEPRINT_FRAGMENT_COMMON
         // NFTPool[CM_BOX][1] = 0;
@@ -134,8 +151,8 @@ contract BoxRedemption is Ownable {
         NFTPool[E_BOX][2] = 4; //GENOMIC_FRAGMENT_RARE
         NFTPool[E_BOX][3] = 4;
         NFTPool[E_BOX][4] = 5; //GENOMIC_FRAGMENT_EPIC
-        NFTPool[E_BOX][5] = 5; 
-        NFTPool[E_BOX][6] = 6;  //SPACE_WARRIOR
+        NFTPool[E_BOX][5] = 5;
+        NFTPool[E_BOX][6] = 6; //SPACE_WARRIOR
         NFTPool[E_BOX][7] = 6;
         NFTPool[E_BOX][8] = 6;
         NFTPool[E_BOX][9] = 6;
@@ -150,61 +167,79 @@ contract BoxRedemption is Ownable {
         NFTPool[E_BOX][18] = 6;
         NFTPool[E_BOX][19] = 6;
 
-        EquipmentPool[0] = GEAR; //Battle Gear
-        EquipmentPool[1] = DRONE; //Battle Drone
-        EquipmentPool[2] = SUITE; //Battle Suit
-        EquipmentPool[3] = BOT; //Battle Bot
-        EquipmentPool[4] = WEAPON; //Weapon
+        EPool[0] = GEAR; //Battle Gear
+        EPool[1] = DRONE; //Battle Drone
+        EPool[2] = SUITE; //Battle Suit
+        EPool[3] = BOT; //Battle Bot
+        EPool[4] = WEAPON; //Weapon
+
+        // SWPool[TRANING_CAMP][CM_BOX][0] = 0;
+        SWPool[TRANING_CAMP][CM_BOX][1] = 1;
+        SWPool[TRANING_CAMP][CM_BOX][2] = 2;
+        SWPool[TRANING_CAMP][CM_BOX][3] = 3;
+        SWPool[TRANING_CAMP][CM_BOX][4] = 4;
+
+        // SWPool[TRANING_CAMP][R_BOX][0] = 0;
+        SWPool[TRANING_CAMP][R_BOX][1] = 1;
+        SWPool[TRANING_CAMP][R_BOX][2] = 2;
+        SWPool[TRANING_CAMP][R_BOX][3] = 3;
+        SWPool[TRANING_CAMP][R_BOX][4] = 4;
+
+        // SWPool[TRANING_CAMP][E_BOX][0] = 0;
+        SWPool[TRANING_CAMP][E_BOX][1] = 1;
+        SWPool[TRANING_CAMP][E_BOX][2] = 2;
+        SWPool[TRANING_CAMP][E_BOX][3] = 3;
+        SWPool[TRANING_CAMP][E_BOX][4] = 4;
     }
 
     function initialRandomData() public onlyOwner {
         // --- For Common Box ------
-        BlueprintPool[CM_BOX][COMMON][GEAR][0] = 1;
-        BlueprintPool[CM_BOX][COMMON][GEAR][1] = 2;
-        BlueprintPool[CM_BOX][COMMON][GEAR][2] = 3;
-        BlueprintPool[CM_BOX][COMMON][GEAR][3] = 4;
+        BPPool[CM_BOX][COMMON][GEAR][0] = 1;
+        BPPool[CM_BOX][COMMON][GEAR][1] = 2;
+        BPPool[CM_BOX][COMMON][GEAR][2] = 3;
+        BPPool[CM_BOX][COMMON][GEAR][3] = 4;
 
-        BlueprintPool[CM_BOX][COMMON][DRONE][0] = 1;
-        BlueprintPool[CM_BOX][COMMON][DRONE][1] = 2;
-        BlueprintPool[CM_BOX][COMMON][DRONE][2] = 3;
-        BlueprintPool[CM_BOX][COMMON][DRONE][3] = 4;
+        BPPool[CM_BOX][COMMON][DRONE][0] = 1;
+        BPPool[CM_BOX][COMMON][DRONE][1] = 2;
+        BPPool[CM_BOX][COMMON][DRONE][2] = 3;
+        BPPool[CM_BOX][COMMON][DRONE][3] = 4;
 
-        BlueprintPool[CM_BOX][COMMON][SUITE][0] = 0;
-        BlueprintPool[CM_BOX][COMMON][SUITE][1] = 1;
-        BlueprintPool[CM_BOX][COMMON][SUITE][2] = 2;
+        // BPPool[CM_BOX][COMMON][SUITE][0] = 0;
+        BPPool[CM_BOX][COMMON][SUITE][1] = 1;
+        BPPool[CM_BOX][COMMON][SUITE][2] = 2;
 
-        BlueprintPool[CM_BOX][COMMON][BOT][0] = 1;
-        BlueprintPool[CM_BOX][COMMON][BOT][1] = 2;
-        BlueprintPool[CM_BOX][COMMON][BOT][2] = 3;
-        BlueprintPool[CM_BOX][COMMON][BOT][3] = 4;
+        BPPool[CM_BOX][COMMON][BOT][0] = 1;
+        BPPool[CM_BOX][COMMON][BOT][1] = 2;
+        BPPool[CM_BOX][COMMON][BOT][2] = 3;
+        BPPool[CM_BOX][COMMON][BOT][3] = 4;
 
-        BlueprintPool[CM_BOX][COMMON][WEAPON][0] = 0;
-        BlueprintPool[CM_BOX][COMMON][WEAPON][1] = 1;
-        BlueprintPool[CM_BOX][COMMON][WEAPON][2] = 2;
-        BlueprintPool[CM_BOX][COMMON][WEAPON][3] = 3;
+        // BPPool[CM_BOX][COMMON][WEAPON][0] = 0;
+        BPPool[CM_BOX][COMMON][WEAPON][1] = 1;
+        BPPool[CM_BOX][COMMON][WEAPON][2] = 2;
+        BPPool[CM_BOX][COMMON][WEAPON][3] = 3;
         //
-        BlueprintPool[CM_BOX][RARE][GEAR][0] = 5;
-        BlueprintPool[CM_BOX][RARE][GEAR][1] = 6;
-        BlueprintPool[CM_BOX][RARE][GEAR][2] = 7;
+        BPPool[CM_BOX][RARE][GEAR][0] = 5;
+        BPPool[CM_BOX][RARE][GEAR][1] = 6;
+        BPPool[CM_BOX][RARE][GEAR][2] = 7;
 
-        BlueprintPool[CM_BOX][RARE][DRONE][0] = 5;
-        BlueprintPool[CM_BOX][RARE][DRONE][1] = 6;
-        BlueprintPool[CM_BOX][RARE][DRONE][2] = 7;
+        BPPool[CM_BOX][RARE][DRONE][0] = 5;
+        BPPool[CM_BOX][RARE][DRONE][1] = 6;
+        BPPool[CM_BOX][RARE][DRONE][2] = 7;
 
-        BlueprintPool[CM_BOX][RARE][SUITE][0] = 3;
-        BlueprintPool[CM_BOX][RARE][SUITE][1] = 4;
-        BlueprintPool[CM_BOX][RARE][SUITE][2] = 5;
+        BPPool[CM_BOX][RARE][SUITE][0] = 3;
+        BPPool[CM_BOX][RARE][SUITE][1] = 4;
+        BPPool[CM_BOX][RARE][SUITE][2] = 5;
 
-        BlueprintPool[CM_BOX][RARE][BOT][0] = 5;
-        BlueprintPool[CM_BOX][RARE][BOT][1] = 6;
-        BlueprintPool[CM_BOX][RARE][BOT][2] = 7;
+        BPPool[CM_BOX][RARE][BOT][0] = 5;
+        BPPool[CM_BOX][RARE][BOT][1] = 6;
+        BPPool[CM_BOX][RARE][BOT][2] = 7;
 
-        BlueprintPool[CM_BOX][RARE][WEAPON][0] = 4;
-        BlueprintPool[CM_BOX][RARE][WEAPON][1] = 5;
-        BlueprintPool[CM_BOX][RARE][WEAPON][2] = 6;
-        BlueprintPool[CM_BOX][RARE][WEAPON][3] = 7;
+        BPPool[CM_BOX][RARE][WEAPON][0] = 4;
+        BPPool[CM_BOX][RARE][WEAPON][1] = 5;
+        BPPool[CM_BOX][RARE][WEAPON][2] = 6;
+        BPPool[CM_BOX][RARE][WEAPON][3] = 7;
 
-        GenomicPool[CM_BOX][COMMON][0] = 0;
+        // GenomicPool[CM_BOX][COMMON][0] = 0;
         GenomicPool[CM_BOX][COMMON][1] = 1;
         GenomicPool[CM_BOX][COMMON][2] = 2;
         GenomicPool[CM_BOX][COMMON][3] = 3;
@@ -213,78 +248,78 @@ contract BoxRedemption is Ownable {
         GenomicPool[CM_BOX][COMMON][6] = 6;
 
         // --- For  Rare Box ------
-        BlueprintPool[R_BOX][COMMON][GEAR][0] = 1;
-        BlueprintPool[R_BOX][COMMON][GEAR][1] = 2;
-        BlueprintPool[R_BOX][COMMON][GEAR][2] = 3;
-        BlueprintPool[R_BOX][COMMON][GEAR][3] = 4;
+        BPPool[R_BOX][COMMON][GEAR][0] = 1;
+        BPPool[R_BOX][COMMON][GEAR][1] = 2;
+        BPPool[R_BOX][COMMON][GEAR][2] = 3;
+        BPPool[R_BOX][COMMON][GEAR][3] = 4;
 
-        BlueprintPool[R_BOX][COMMON][DRONE][0] = 1;
-        BlueprintPool[R_BOX][COMMON][DRONE][1] = 2;
-        BlueprintPool[R_BOX][COMMON][DRONE][2] = 3;
-        BlueprintPool[R_BOX][COMMON][DRONE][3] = 4;
+        BPPool[R_BOX][COMMON][DRONE][0] = 1;
+        BPPool[R_BOX][COMMON][DRONE][1] = 2;
+        BPPool[R_BOX][COMMON][DRONE][2] = 3;
+        BPPool[R_BOX][COMMON][DRONE][3] = 4;
 
-        BlueprintPool[R_BOX][COMMON][SUITE][0] = 0;
-        BlueprintPool[R_BOX][COMMON][SUITE][1] = 1;
-        BlueprintPool[R_BOX][COMMON][SUITE][2] = 2;
+        // BPPool[R_BOX][COMMON][SUITE][0] = 0;
+        BPPool[R_BOX][COMMON][SUITE][1] = 1;
+        BPPool[R_BOX][COMMON][SUITE][2] = 2;
 
-        BlueprintPool[R_BOX][COMMON][BOT][0] = 1;
-        BlueprintPool[R_BOX][COMMON][BOT][1] = 2;
-        BlueprintPool[R_BOX][COMMON][BOT][2] = 3;
-        BlueprintPool[R_BOX][COMMON][BOT][3] = 4;
+        BPPool[R_BOX][COMMON][BOT][0] = 1;
+        BPPool[R_BOX][COMMON][BOT][1] = 2;
+        BPPool[R_BOX][COMMON][BOT][2] = 3;
+        BPPool[R_BOX][COMMON][BOT][3] = 4;
 
-        BlueprintPool[R_BOX][COMMON][WEAPON][0] = 0;
-        BlueprintPool[R_BOX][COMMON][WEAPON][1] = 1;
-        BlueprintPool[R_BOX][COMMON][WEAPON][2] = 2;
-        BlueprintPool[R_BOX][COMMON][WEAPON][3] = 3;
+        // BPPool[R_BOX][COMMON][WEAPON][0] = 0;
+        BPPool[R_BOX][COMMON][WEAPON][1] = 1;
+        BPPool[R_BOX][COMMON][WEAPON][2] = 2;
+        BPPool[R_BOX][COMMON][WEAPON][3] = 3;
         //
-        BlueprintPool[R_BOX][RARE][GEAR][0] = 5;
-        BlueprintPool[R_BOX][RARE][GEAR][1] = 6;
-        BlueprintPool[R_BOX][RARE][GEAR][2] = 7;
+        BPPool[R_BOX][RARE][GEAR][0] = 5;
+        BPPool[R_BOX][RARE][GEAR][1] = 6;
+        BPPool[R_BOX][RARE][GEAR][2] = 7;
 
-        BlueprintPool[R_BOX][RARE][DRONE][0] = 5;
-        BlueprintPool[R_BOX][RARE][DRONE][1] = 6;
-        BlueprintPool[R_BOX][RARE][DRONE][2] = 7;
+        BPPool[R_BOX][RARE][DRONE][0] = 5;
+        BPPool[R_BOX][RARE][DRONE][1] = 6;
+        BPPool[R_BOX][RARE][DRONE][2] = 7;
 
-        BlueprintPool[R_BOX][RARE][SUITE][0] = 3;
-        BlueprintPool[R_BOX][RARE][SUITE][1] = 4;
-        BlueprintPool[R_BOX][RARE][SUITE][2] = 5;
+        BPPool[R_BOX][RARE][SUITE][0] = 3;
+        BPPool[R_BOX][RARE][SUITE][1] = 4;
+        BPPool[R_BOX][RARE][SUITE][2] = 5;
 
-        BlueprintPool[R_BOX][RARE][BOT][0] = 5;
-        BlueprintPool[R_BOX][RARE][BOT][1] = 6;
-        BlueprintPool[R_BOX][RARE][BOT][2] = 7;
+        BPPool[R_BOX][RARE][BOT][0] = 5;
+        BPPool[R_BOX][RARE][BOT][1] = 6;
+        BPPool[R_BOX][RARE][BOT][2] = 7;
 
-        BlueprintPool[R_BOX][RARE][WEAPON][0] = 4;
-        BlueprintPool[R_BOX][RARE][WEAPON][1] = 5;
-        BlueprintPool[R_BOX][RARE][WEAPON][2] = 6;
-        BlueprintPool[R_BOX][RARE][WEAPON][3] = 7;
-        BlueprintPool[R_BOX][RARE][WEAPON][4] = 8;
+        BPPool[R_BOX][RARE][WEAPON][0] = 4;
+        BPPool[R_BOX][RARE][WEAPON][1] = 5;
+        BPPool[R_BOX][RARE][WEAPON][2] = 6;
+        BPPool[R_BOX][RARE][WEAPON][3] = 7;
+        BPPool[R_BOX][RARE][WEAPON][4] = 8;
 
         //Epic
-        BlueprintPool[R_BOX][EPIC][GEAR][0] = 8;
-        BlueprintPool[R_BOX][EPIC][GEAR][1] = 9;
-        BlueprintPool[R_BOX][EPIC][GEAR][2] = 10;
+        BPPool[R_BOX][EPIC][GEAR][0] = 8;
+        BPPool[R_BOX][EPIC][GEAR][1] = 9;
+        BPPool[R_BOX][EPIC][GEAR][2] = 10;
 
-        BlueprintPool[R_BOX][EPIC][DRONE][0] = 8;
-        BlueprintPool[R_BOX][EPIC][DRONE][1] = 9;
-        BlueprintPool[R_BOX][EPIC][DRONE][2] = 10;
+        BPPool[R_BOX][EPIC][DRONE][0] = 8;
+        BPPool[R_BOX][EPIC][DRONE][1] = 9;
+        BPPool[R_BOX][EPIC][DRONE][2] = 10;
 
-        BlueprintPool[R_BOX][EPIC][SUITE][0] = 6;
-        BlueprintPool[R_BOX][EPIC][SUITE][1] = 7;
-        BlueprintPool[R_BOX][EPIC][SUITE][2] = 8;
-        BlueprintPool[R_BOX][EPIC][SUITE][3] = 9;
+        BPPool[R_BOX][EPIC][SUITE][0] = 6;
+        BPPool[R_BOX][EPIC][SUITE][1] = 7;
+        BPPool[R_BOX][EPIC][SUITE][2] = 8;
+        BPPool[R_BOX][EPIC][SUITE][3] = 9;
 
-        BlueprintPool[R_BOX][EPIC][BOT][0] = 8;
-        BlueprintPool[R_BOX][EPIC][BOT][1] = 9;
-        BlueprintPool[R_BOX][EPIC][BOT][2] = 10;
+        BPPool[R_BOX][EPIC][BOT][0] = 8;
+        BPPool[R_BOX][EPIC][BOT][1] = 9;
+        BPPool[R_BOX][EPIC][BOT][2] = 10;
 
-        BlueprintPool[R_BOX][EPIC][WEAPON][0] = 9;
-        BlueprintPool[R_BOX][EPIC][WEAPON][1] = 10;
-        BlueprintPool[R_BOX][EPIC][WEAPON][2] = 11;
-        BlueprintPool[R_BOX][EPIC][WEAPON][3] = 12;
-        BlueprintPool[R_BOX][EPIC][WEAPON][4] = 13;
-        BlueprintPool[R_BOX][EPIC][WEAPON][5] = 14;
+        BPPool[R_BOX][EPIC][WEAPON][0] = 9;
+        BPPool[R_BOX][EPIC][WEAPON][1] = 10;
+        BPPool[R_BOX][EPIC][WEAPON][2] = 11;
+        BPPool[R_BOX][EPIC][WEAPON][3] = 12;
+        BPPool[R_BOX][EPIC][WEAPON][4] = 13;
+        BPPool[R_BOX][EPIC][WEAPON][5] = 14;
 
-        GenomicPool[R_BOX][COMMON][0] = 0;
+        // GenomicPool[R_BOX][COMMON][0] = 0;
         GenomicPool[R_BOX][COMMON][1] = 1;
         GenomicPool[R_BOX][COMMON][2] = 2;
         GenomicPool[R_BOX][COMMON][3] = 3;
@@ -300,54 +335,54 @@ contract BoxRedemption is Ownable {
         GenomicPool[R_BOX][RARE][5] = 12;
 
         // --- For Epic Box ------
-        BlueprintPool[E_BOX][RARE][GEAR][0] = 8;
-        BlueprintPool[E_BOX][RARE][GEAR][1] = 9;
-        BlueprintPool[E_BOX][RARE][GEAR][2] = 10;
+        BPPool[E_BOX][RARE][GEAR][0] = 8;
+        BPPool[E_BOX][RARE][GEAR][1] = 9;
+        BPPool[E_BOX][RARE][GEAR][2] = 10;
 
-        BlueprintPool[E_BOX][RARE][DRONE][0] = 8;
-        BlueprintPool[E_BOX][RARE][DRONE][1] = 9;
-        BlueprintPool[E_BOX][RARE][DRONE][2] = 10;
+        BPPool[E_BOX][RARE][DRONE][0] = 8;
+        BPPool[E_BOX][RARE][DRONE][1] = 9;
+        BPPool[E_BOX][RARE][DRONE][2] = 10;
 
-        BlueprintPool[E_BOX][RARE][SUITE][0] = 6;
-        BlueprintPool[E_BOX][RARE][SUITE][1] = 7;
-        BlueprintPool[E_BOX][RARE][SUITE][2] = 8;
-        BlueprintPool[E_BOX][RARE][SUITE][3] = 9;
+        BPPool[E_BOX][RARE][SUITE][0] = 6;
+        BPPool[E_BOX][RARE][SUITE][1] = 7;
+        BPPool[E_BOX][RARE][SUITE][2] = 8;
+        BPPool[E_BOX][RARE][SUITE][3] = 9;
 
-        BlueprintPool[E_BOX][RARE][BOT][0] = 8;
-        BlueprintPool[E_BOX][RARE][BOT][1] = 9;
-        BlueprintPool[E_BOX][RARE][BOT][2] = 10;
+        BPPool[E_BOX][RARE][BOT][0] = 8;
+        BPPool[E_BOX][RARE][BOT][1] = 9;
+        BPPool[E_BOX][RARE][BOT][2] = 10;
 
-        BlueprintPool[E_BOX][RARE][WEAPON][0] = 9;
-        BlueprintPool[E_BOX][RARE][WEAPON][1] = 10;
-        BlueprintPool[E_BOX][RARE][WEAPON][2] = 11;
-        BlueprintPool[E_BOX][RARE][WEAPON][3] = 12;
-        BlueprintPool[E_BOX][RARE][WEAPON][4] = 13;
-        BlueprintPool[E_BOX][RARE][WEAPON][5] = 14;
+        BPPool[E_BOX][RARE][WEAPON][0] = 9;
+        BPPool[E_BOX][RARE][WEAPON][1] = 10;
+        BPPool[E_BOX][RARE][WEAPON][2] = 11;
+        BPPool[E_BOX][RARE][WEAPON][3] = 12;
+        BPPool[E_BOX][RARE][WEAPON][4] = 13;
+        BPPool[E_BOX][RARE][WEAPON][5] = 14;
 
         //Epic
-        BlueprintPool[E_BOX][EPIC][GEAR][0] = 8;
-        BlueprintPool[E_BOX][EPIC][GEAR][1] = 9;
-        BlueprintPool[E_BOX][EPIC][GEAR][2] = 10;
+        BPPool[E_BOX][EPIC][GEAR][0] = 8;
+        BPPool[E_BOX][EPIC][GEAR][1] = 9;
+        BPPool[E_BOX][EPIC][GEAR][2] = 10;
 
-        BlueprintPool[E_BOX][EPIC][DRONE][0] = 8;
-        BlueprintPool[E_BOX][EPIC][DRONE][1] = 9;
-        BlueprintPool[E_BOX][EPIC][DRONE][2] = 10;
+        BPPool[E_BOX][EPIC][DRONE][0] = 8;
+        BPPool[E_BOX][EPIC][DRONE][1] = 9;
+        BPPool[E_BOX][EPIC][DRONE][2] = 10;
 
-        BlueprintPool[E_BOX][EPIC][SUITE][0] = 6;
-        BlueprintPool[E_BOX][EPIC][SUITE][1] = 7;
-        BlueprintPool[E_BOX][EPIC][SUITE][2] = 8;
-        BlueprintPool[E_BOX][EPIC][SUITE][3] = 9;
+        BPPool[E_BOX][EPIC][SUITE][0] = 6;
+        BPPool[E_BOX][EPIC][SUITE][1] = 7;
+        BPPool[E_BOX][EPIC][SUITE][2] = 8;
+        BPPool[E_BOX][EPIC][SUITE][3] = 9;
 
-        BlueprintPool[E_BOX][EPIC][BOT][0] = 8;
-        BlueprintPool[E_BOX][EPIC][BOT][1] = 9;
-        BlueprintPool[E_BOX][EPIC][BOT][2] = 10;
+        BPPool[E_BOX][EPIC][BOT][0] = 8;
+        BPPool[E_BOX][EPIC][BOT][1] = 9;
+        BPPool[E_BOX][EPIC][BOT][2] = 10;
 
-        BlueprintPool[E_BOX][EPIC][WEAPON][0] = 9;
-        BlueprintPool[E_BOX][EPIC][WEAPON][1] = 10;
-        BlueprintPool[E_BOX][EPIC][WEAPON][2] = 11;
-        BlueprintPool[E_BOX][EPIC][WEAPON][3] = 12;
-        BlueprintPool[E_BOX][EPIC][WEAPON][4] = 13;
-        BlueprintPool[E_BOX][EPIC][WEAPON][5] = 14;
+        BPPool[E_BOX][EPIC][WEAPON][0] = 9;
+        BPPool[E_BOX][EPIC][WEAPON][1] = 10;
+        BPPool[E_BOX][EPIC][WEAPON][2] = 11;
+        BPPool[E_BOX][EPIC][WEAPON][3] = 12;
+        BPPool[E_BOX][EPIC][WEAPON][4] = 13;
+        BPPool[E_BOX][EPIC][WEAPON][5] = 14;
 
         // GenomicPool[E_BOX][COMMON][0] = 0;
         // GenomicPool[E_BOX][COMMON][1] = 1;
@@ -371,25 +406,6 @@ contract BoxRedemption is Ownable {
     }
 
     function initialSpaceData1() public onlyOwner {
-        //TrainingCampPool
-        SWPool[TRANING_CAMP][CM_BOX][0] = 0;
-        SWPool[TRANING_CAMP][CM_BOX][1] = 1;
-        SWPool[TRANING_CAMP][CM_BOX][2] = 2;
-        SWPool[TRANING_CAMP][CM_BOX][3] = 3;
-        SWPool[TRANING_CAMP][CM_BOX][4] = 4;
-        
-        SWPool[TRANING_CAMP][R_BOX][0] = 0;
-        SWPool[TRANING_CAMP][R_BOX][1] = 1;
-        SWPool[TRANING_CAMP][R_BOX][2] = 2;
-        SWPool[TRANING_CAMP][R_BOX][3] = 3;
-        SWPool[TRANING_CAMP][R_BOX][4] = 4;
-
-        SWPool[TRANING_CAMP][E_BOX][0] = 0;
-        SWPool[TRANING_CAMP][E_BOX][1] = 1;
-        SWPool[TRANING_CAMP][E_BOX][2] = 2;
-        SWPool[TRANING_CAMP][E_BOX][3] = 3;
-        SWPool[TRANING_CAMP][E_BOX][4] = 4;
-
         //BattleGearCampPool
         // SWPool[GEAR][CM_BOX][0] = 0;
         // SWPool[GEAR][CM_BOX][1] = 0;
@@ -935,292 +951,222 @@ contract BoxRedemption is Ownable {
         SWPool[WEAPON][R_BOX][31] = 14;
     }
 
-    function openBoxFromGalaxy(uint _nftType, uint _galaxy_id) public {
-
-        ERC1155Burnable _token;
-        if(_nftType == 0){
-            _token = ERC1155Burnable(GALAXY_CONTRACT_CM);
-        }else if(_nftType == 1){
-            _token = ERC1155Burnable(GALAXY_CONTRACT_RARE);
-        }else if(_nftType == 2){
-            _token = ERC1155Burnable(GALAXY_CONTRACT_EPIC);
+    function openBoxFromGalaxy(uint256 _nftType, uint256 _galaxy_id) public {
+        ERC1155_CONTRACT _token;
+        if (_nftType == 0) {
+            _token = ERC1155_CONTRACT(GAX_CM);
+        } else if (_nftType == 1) {
+            _token = ERC1155_CONTRACT(GAX_RARE);
+        } else if (_nftType == 2) {
+            _token = ERC1155_CONTRACT(GAX_EPIC);
         }
 
         uint256 _balance = _token.balanceOf(msg.sender, _galaxy_id);
         require(_balance >= 1, "Your balance is insufficient.");
+        burnAndMint(_token, _nftType, _galaxy_id);
+    }
 
-        uint256 randomNumber = RANDOM_CONTRACT(RANDOM_WORKER_CONTRACT).startRandom();
-        randomNumberToSender[randomNumber] = msg.sender;
+    function burnAndMint(
+        ERC1155_CONTRACT _token,
+        uint256 _nftType,
+        uint256 _id
+    ) internal {
+        uint256 randomNumber = RANDOM_CONTRACT(RANDOM_WORKER_CONTRACT)
+            .startRandom();
+        ranNumToSender[randomNumber] = msg.sender;
         requestToNFTId[randomNumber] = _nftType;
-        _token.burn(msg.sender, _galaxy_id, 1);
-        
-        string memory partCode = GenerateNFTCode(randomNumber, _nftType);
-
+        _token.burn(msg.sender, _id, 1);
+        string memory partCode = createNFTCode(randomNumber, _nftType);
         mintNFT(randomNumber, partCode);
-
         emit OpenBox(msg.sender, _nftType, partCode);
     }
 
     function openBox(uint256 _id) public {
-        ERC1155Burnable _token = ERC1155Burnable(MISTORY_BOX_CONTRACT);
+        ERC1155_CONTRACT _token = ERC1155_CONTRACT(MISTORY_BOX_CONTRACT);
         uint256 _balance = _token.balanceOf(msg.sender, _id);
         require(_balance >= 1, "Your balance is insufficient.");
-
-        uint256 randomNumber = RANDOM_CONTRACT(RANDOM_WORKER_CONTRACT)
-            .startRandom();
-
-        randomNumberToSender[randomNumber] = msg.sender;
-        requestToNFTId[randomNumber] = _id;
-        _token.burn(msg.sender, _id, 1);
-        string memory partCode = GenerateNFTCode(randomNumber, _id);
-
-        mintNFT(randomNumber, partCode);
-
-        emit OpenBox(msg.sender, _id, partCode);
+        burnAndMint(_token, _id, _id);
     }
 
     function mintNFT(uint256 randomNumber, string memory concatedCode) private {
         ERC721_CONTRACT _nftCore = ERC721_CONTRACT(ECIO_NFT_CORE_CONTRACT);
-        _nftCore.safeMint(randomNumberToSender[randomNumber], concatedCode);
+        _nftCore.safeMint(ranNumToSender[randomNumber], concatedCode);
     }
 
-    function GetRandomNumberWithMod(
-        uint256 _randomNumber,
+    function createGenomic(
+        uint256 _id,
+        uint256 _nftTypeCode,
+        uint256 _number,
+        uint256 _rarity
+    ) private view returns (string memory) {
+        uint256 genomicType = GenomicPool[_id][_rarity][_number];
+        return
+            createPartCode(
+                0,
+                0, //combatRanksCode
+                0, //weaponCode
+                genomicType, //humanGenomeCode
+                0, //battleBotCode
+                0, //battleSuiteCode
+                0, //battleDroneCode
+                0, //battleGearCode
+                0, //trainingCode
+                0, //kingdomCode
+                _nftTypeCode
+            );
+    }
+
+    function createNFTCode(uint256 _ranNum, uint256 _id)
+        internal
+        view
+        returns (string memory)
+    {
+        uint256 randomNFTType = ranNumWithMod(_ranNum, 1, 20);
+        uint256 nftTypeCode = NFTPool[_id][randomNFTType];
+        string memory partCode;
+        uint256 eRandom = ranNumWithMod(_ranNum, 2, 5);
+        uint256 eTypeId = EPool[eRandom];
+        if (nftTypeCode == GENOMIC_FRAGMENT_COMMON) {
+            uint256 number = ranNumWithMod(_ranNum, 2, 7);
+            partCode = createGenomic(_id, nftTypeCode, number, COMMON);
+        } else if (nftTypeCode == GENOMIC_FRAGMENT_RARE) {
+            uint256 number = ranNumWithMod(_ranNum, 2, 6);
+            partCode = createGenomic(_id, nftTypeCode, number, RARE);
+        } else if (nftTypeCode == GENOMIC_FRAGMENT_EPIC) {
+            uint256 number = ranNumWithMod(_ranNum, 2, 4);
+            partCode = createGenomic(_id, nftTypeCode, number, EPIC);
+        } else if (nftTypeCode == BLUEPRINT_FRAGMENT_COMMON) {
+            uint256 maxRan = maxRanForBluePrintCommon(_id, eTypeId);
+            eRandom = ranNumWithMod(_ranNum, 2, maxRan);
+            uint256 ePartId = BPPool[_id][COMMON][eTypeId][eRandom];
+            partCode = createBlueprintPartCode(nftTypeCode, eTypeId, ePartId);
+        } else if (nftTypeCode == BLUEPRINT_FRAGMENT_RARE) {
+            uint256 maxRan = maxRanForBluePrintRare(_id, eTypeId);
+            eRandom = ranNumWithMod(_ranNum, 2, maxRan);
+            uint256 ePartId = BPPool[_id][RARE][eTypeId][eRandom];
+            partCode = createBlueprintPartCode(nftTypeCode, eTypeId, ePartId);
+        } else if (nftTypeCode == BLUEPRINT_FRAGMENT_EPIC) {
+            uint256 maxRan = maxRanForBluePrintEpic(_id, eTypeId);
+            eRandom = ranNumWithMod(_ranNum, 2, maxRan);
+            uint256 ePartId = BPPool[_id][EPIC][eTypeId][eRandom];
+            partCode = createBlueprintPartCode(nftTypeCode, eTypeId, ePartId);
+        } else if (nftTypeCode == SPACE_WARRIOR) {
+            partCode = createSW(_ranNum, _id);
+        }
+
+        return partCode;
+    }
+
+    function ranNumWithMod(
+        uint256 _ranNum,
         uint256 digit,
         uint256 mod
     ) public view virtual returns (uint256) {
         if (digit == 1) {
-            return (_randomNumber % 100) % mod;
+            return (_ranNum % 100) % mod;
         } else if (digit == 2) {
-            return ((_randomNumber % 10000) / 100) % mod;
+            return ((_ranNum % 10000) / 100) % mod;
         } else if (digit == 3) {
-            return ((_randomNumber % 1000000) / 10000) % mod;
+            return ((_ranNum % 1000000) / 10000) % mod;
         } else if (digit == 4) {
-            return ((_randomNumber % 100000000) / 1000000) % mod;
+            return ((_ranNum % 100000000) / 1000000) % mod;
         } else if (digit == 5) {
-            return ((_randomNumber % 10000000000) / 100000000) % mod;
+            return ((_ranNum % 10000000000) / 100000000) % mod;
         } else if (digit == 6) {
-            return ((_randomNumber % 1000000000000) / 10000000000) % mod;
+            return ((_ranNum % 1000000000000) / 10000000000) % mod;
         } else if (digit == 7) {
-            return ((_randomNumber % 100000000000000) / 1000000000000) % mod;
+            return ((_ranNum % 100000000000000) / 1000000000000) % mod;
         } else if (digit == 8) {
-            return
-                ((_randomNumber % 10000000000000000) / 100000000000000) % mod;
-        } else if (digit == 9) {
-            return
-                ((_randomNumber % 1000000000000000000) / 10000000000000000) %
-                mod;
-        } else if (digit == 10) {
-            return
-                ((_randomNumber % 100000000000000000000) /
-                    1000000000000000000) % mod;
+            return ((_ranNum % 10000000000000000) / 100000000000000) % mod;
         }
 
         return 0;
     }
 
-    function extactDigit(uint256 _randomNumber)
-        internal
-        pure
-        returns (Digit memory)
-    {
+    function extactDigit(uint256 _ranNum) internal pure returns (Digit memory) {
         Digit memory digit;
-        digit.digit1 = (_randomNumber % 100);
-        digit.digit2 = ((_randomNumber % 10000) / 100);
-        digit.digit3 = ((_randomNumber % 1000000) / 10000);
-        digit.digit4 = ((_randomNumber % 100000000) / 1000000);
-        digit.digit5 = ((_randomNumber % 10000000000) / 100000000);
-        digit.digit6 = ((_randomNumber % 1000000000000) / 10000000000);
-        digit.digit7 = ((_randomNumber % 100000000000000) / 1000000000000);
-        digit.digit8 = ((_randomNumber % 10000000000000000) / 100000000000000);
+        digit.digit1 = (_ranNum % 100);
+        digit.digit2 = ((_ranNum % 10000) / 100);
+        digit.digit3 = ((_ranNum % 1000000) / 10000);
+        digit.digit4 = ((_ranNum % 100000000) / 1000000);
+        digit.digit5 = ((_ranNum % 10000000000) / 100000000);
+        digit.digit6 = ((_ranNum % 1000000000000) / 10000000000);
+        digit.digit7 = ((_ranNum % 100000000000000) / 1000000000000);
+        digit.digit8 = ((_ranNum % 10000000000000000) / 100000000000000);
         return digit;
     }
 
-    function GenerateNFTCode(uint256 _randomNumber, uint256 _id)
-        internal
-        view
-        returns (string memory)
+    function maxRanForBluePrintCommon(uint256 _id, uint256 eTypeId)
+        private
+        pure
+        returns (uint256)
     {
-        uint256 randomNFTType = GetRandomNumberWithMod(_randomNumber, 1, 20);
-        uint256 nftTypeCode = NFTPool[_id][randomNFTType];
-        string memory partCode;
-
-        if (nftTypeCode == BLUEPRINT_FRAGMENT_COMMON) {
-            //Random Equipment Part
-            uint256 equipmemtRandom = GetRandomNumberWithMod(
-                _randomNumber,
-                2,
-                5
-            );
-
-            uint256 equipmemtTypeId = EquipmentPool[equipmemtRandom];
-
-            uint256 maxRandom;
-            if (_id == CM_BOX || _id == R_BOX) {
-                if (equipmemtTypeId == SUITE) {
-                    maxRandom = 3;
-                } else {
-                    maxRandom = 4;
-                }
-            } else if (_id == E_BOX) {
-                if (
-                    equipmemtTypeId == GEAR ||
-                    equipmemtTypeId == DRONE ||
-                    equipmemtTypeId == BOT
-                ) {
-                    maxRandom = 3;
-                } else if (equipmemtTypeId == SUITE) {
-                    maxRandom = 4;
-                } else if (equipmemtTypeId == WEAPON) {
-                    maxRandom = 6;
-                }
+        uint256 maxRan;
+        if (_id == CM_BOX || _id == R_BOX) {
+            if (eTypeId == SUITE) {
+                maxRan = 3;
+            } else {
+                maxRan = 4;
             }
-
-            equipmemtRandom = GetRandomNumberWithMod(
-                _randomNumber,
-                2,
-                maxRandom
-            );
-
-            uint256 equipmemtPartId = BlueprintPool[_id][COMMON][
-                equipmemtTypeId
-            ][equipmemtRandom];
-            partCode = createBlueprintFragmentPartCode(
-                nftTypeCode,
-                equipmemtTypeId,
-                equipmemtPartId
-            );
-        } else if (nftTypeCode == BLUEPRINT_FRAGMENT_RARE) {
-            uint256 equipmemtRandom = GetRandomNumberWithMod(
-                _randomNumber,
-                2,
-                5
-            );
-
-            uint256 equipmemtTypeId = EquipmentPool[equipmemtRandom];
-
-            uint256 maxRandom;
-            if (_id == CM_BOX) {
-                if (equipmemtTypeId == WEAPON) {
-                    maxRandom = 4;
-                } else {
-                    maxRandom = 3;
-                }
-            } else if (_id == R_BOX) {
-                if (equipmemtTypeId == WEAPON) {
-                    maxRandom = 5;
-                } else {
-                    maxRandom = 3;
-                }
-            } else if (_id == E_BOX) {
-                if (
-                    equipmemtTypeId == GEAR ||
-                    equipmemtTypeId == DRONE ||
-                    equipmemtTypeId == BOT
-                ) {
-                    maxRandom = 3;
-                } else if (equipmemtTypeId == SUITE) {
-                    maxRandom = 4;
-                } else if (equipmemtTypeId == WEAPON) {
-                    maxRandom = 6;
-                }
+        } else if (_id == E_BOX) {
+            if (eTypeId == GEAR || eTypeId == DRONE || eTypeId == BOT) {
+                maxRan = 3;
+            } else if (eTypeId == SUITE) {
+                maxRan = 4;
+            } else if (eTypeId == WEAPON) {
+                maxRan = 6;
             }
-
-            uint256 equipmemtPartId = BlueprintPool[_id][RARE][equipmemtTypeId][
-                equipmemtRandom
-            ];
-            partCode = createBlueprintFragmentPartCode(
-                nftTypeCode,
-                equipmemtTypeId,
-                equipmemtPartId
-            );
-        } else if (nftTypeCode == BLUEPRINT_FRAGMENT_EPIC) {
-            uint256 equipmemtRandom = GetRandomNumberWithMod(
-                _randomNumber,
-                2,
-                5
-            );
-
-            uint256 equipmemtTypeId = EquipmentPool[equipmemtRandom];
-
-            uint256 maxRandom;
-            if (_id == R_BOX || _id == E_BOX) {
-                if (
-                    equipmemtTypeId == GEAR ||
-                    equipmemtTypeId == DRONE ||
-                    equipmemtTypeId == BOT
-                ) {
-                    maxRandom = 3;
-                } else if (equipmemtTypeId == SUITE) {
-                    maxRandom = 4;
-                } else if (equipmemtTypeId == WEAPON) {
-                    maxRandom = 6;
-                }
-            } 
-
-            uint256 equipmemtPartId = BlueprintPool[_id][EPIC][equipmemtTypeId][
-                equipmemtRandom
-            ];
-            partCode = createBlueprintFragmentPartCode(
-                nftTypeCode,
-                equipmemtTypeId,
-                equipmemtPartId
-            );
-        } else if (nftTypeCode == GENOMIC_FRAGMENT_COMMON) {
-
-            uint256 number = GetRandomNumberWithMod(_randomNumber, 2, 7);
-            uint256 genomicFragmentType = GenomicPool[_id][COMMON][number];
-            partCode = createPartCode(
-                0,
-                0, //combatRanksCode
-                0, //weaponCode
-                genomicFragmentType, //humanGenomeCode
-                0, //battleBotCode
-                0, //battleSuiteCode
-                0, //battleDroneCode
-                9, //battleGearCode
-                0, //trainingCode
-                0, //kingdomCode
-                nftTypeCode
-            );
-        } else if (nftTypeCode == GENOMIC_FRAGMENT_RARE) {
-          
-            uint256 number = GetRandomNumberWithMod(_randomNumber, 2, 6);
-            uint256 genomicFragmentType = GenomicPool[_id][RARE][number];
-            partCode = createPartCode(
-                0,
-                0, //combatRanksCode
-                0, //weaponCode
-                genomicFragmentType, //humanGenomeCode
-                0, //battleBotCode
-                0, //battleSuiteCode
-                0, //battleDroneCode
-                9, //battleGearCode
-                0, //trainingCode
-                0, //kingdomCode
-                nftTypeCode
-            );
-        } else if (nftTypeCode == GENOMIC_FRAGMENT_EPIC) {
-            uint256 number = GetRandomNumberWithMod(_randomNumber, 2, 4);
-            uint256 genomicFragmentType = GenomicPool[_id][EPIC][number];
-            partCode = createPartCode(
-                0,
-                0, //combatRanksCode
-                0, //weaponCode
-                genomicFragmentType, //humanGenomeCode
-                0, //battleBotCode
-                0, //battleSuiteCode
-                0, //battleDroneCode
-                9, //battleGearCode
-                0, //trainingCode
-                0, //kingdomCode
-                nftTypeCode
-            );
-        } else if (nftTypeCode == SPACE_WARRIOR) {
-            partCode = createSW(_randomNumber, _id);
         }
 
-        return partCode;
+        return maxRan;
+    }
+
+    function maxRanForBluePrintRare(uint256 _id, uint256 eTypeId)
+        private
+        pure
+        returns (uint256)
+    {
+        uint256 maxRan;
+        if (_id == CM_BOX) {
+            if (eTypeId == WEAPON) {
+                maxRan = 4;
+            } else {
+                maxRan = 3;
+            }
+        } else if (_id == R_BOX) {
+            if (eTypeId == WEAPON) {
+                maxRan = 5;
+            } else {
+                maxRan = 3;
+            }
+        } else if (_id == E_BOX) {
+            if (eTypeId == GEAR || eTypeId == DRONE || eTypeId == BOT) {
+                maxRan = 3;
+            } else if (eTypeId == SUITE) {
+                maxRan = 4;
+            } else if (eTypeId == WEAPON) {
+                maxRan = 6;
+            }
+        }
+        return maxRan;
+    }
+
+    function maxRanForBluePrintEpic(uint256 _id, uint256 eTypeId)
+        private
+        pure
+        returns (uint256)
+    {
+        uint256 maxRan;
+        if (_id == R_BOX || _id == E_BOX) {
+            if (eTypeId == GEAR || eTypeId == DRONE || eTypeId == BOT) {
+                maxRan = 3;
+            } else if (eTypeId == SUITE) {
+                maxRan = 4;
+            } else if (eTypeId == WEAPON) {
+                maxRan = 6;
+            }
+        }
+        return maxRan;
     }
 
     struct Digit {
@@ -1299,7 +1245,7 @@ contract BoxRedemption is Ownable {
         return concatedCode;
     }
 
-    function createBlueprintFragmentPartCode(
+    function createBlueprintPartCode(
         uint256 nftTypeCode,
         uint256 equipmentTypeId,
         uint256 equipmentPartId
