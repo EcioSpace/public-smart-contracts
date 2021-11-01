@@ -965,7 +965,7 @@ contract BoxRedemption is Ownable {
             uint256 equipmemtRandom = GetRandomNumberWithMod(
                 _randomNumber,
                 2,
-                4
+                5
             );
 
             uint256 equipmemtTypeId = EquipmentPool[equipmemtRandom];
@@ -988,7 +988,7 @@ contract BoxRedemption is Ownable {
             uint256 equipmemtRandom = GetRandomNumberWithMod(
                 _randomNumber,
                 2,
-                4
+                5
             );
 
             uint256 equipmemtTypeId = EquipmentPool[equipmemtRandom];
@@ -1011,7 +1011,7 @@ contract BoxRedemption is Ownable {
             uint256 equipmemtRandom = GetRandomNumberWithMod(
                 _randomNumber,
                 2,
-                4
+                5
             );
 
             uint256 equipmemtTypeId = EquipmentPool[equipmemtRandom];
@@ -1168,7 +1168,7 @@ contract BoxRedemption is Ownable {
     ) private pure returns (string memory) {
         string memory partCode;
 
-        if (equipmentTypeId == 0) {
+        if (equipmentTypeId == GEAR) {
             //Battle Gear
             partCode = createPartCode(
                 equipmentTypeId, //equipmentTypeId
@@ -1183,7 +1183,7 @@ contract BoxRedemption is Ownable {
                 0, //kingdomCode
                 nftTypeCode
             );
-        } else if (equipmentTypeId == 1) {
+        } else if (equipmentTypeId == DRONE) {
             //battleDroneCode
             partCode = createPartCode(
                 equipmentTypeId, //equipmentTypeId
@@ -1198,7 +1198,7 @@ contract BoxRedemption is Ownable {
                 0, //kingdomCode
                 nftTypeCode
             );
-        } else if (equipmentTypeId == 2) {
+        } else if (equipmentTypeId == SUITE) {
             //battleSuiteCode
             partCode = createPartCode(
                 equipmentTypeId, //equipmentTypeId
@@ -1213,7 +1213,7 @@ contract BoxRedemption is Ownable {
                 0, //kingdomCode
                 nftTypeCode
             );
-        } else if (equipmentTypeId == 3) {
+        } else if (equipmentTypeId == BOT) {
             //Battle Bot
             partCode = createPartCode(
                 equipmentTypeId, //equipmentTypeId
@@ -1228,7 +1228,7 @@ contract BoxRedemption is Ownable {
                 0, //kingdomCode
                 nftTypeCode
             );
-        } else if (equipmentTypeId == 4) {
+        } else if (equipmentTypeId == WEAPON) {
             //weapon
             partCode = createPartCode(
                 equipmentTypeId, //equipmentTypeId
