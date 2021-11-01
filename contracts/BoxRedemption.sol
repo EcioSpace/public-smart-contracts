@@ -42,12 +42,23 @@ contract BoxRedemption is Ownable {
     uint256 private constant RARE = 1;
     uint256 private constant EPIC = 2;
 
+    //Testnet
     address public constant MISTORY_BOX_CONTRACT =
         0xfB684dC65DE6C27c63fa7a00B9b9fB70d2125Ea1;
     address public constant ECIO_NFT_CORE_CONTRACT =
         0x7E8eEe5be55A589d5571Be7176172f4DEE7f47aF;
     address public constant RANDOM_WORKER_CONTRACT =
         0x5ABF279B87F84C916d0f34c2dafc949f86ffb887;
+
+    //Mainnet
+    // address public constant GALAXY_CONTRACT_CM = 0xaae9f9d4fb8748feba405cE25856DC57C91BbB92;
+    // address public constant GALAXY_CONTRACT_RARE = 0xc04581BEA69A9C781532A17169C59980F4faC757;
+    // address public constant GALAXY_CONTRACT_EPIC = 0x9C90ba4C8834e92A771e4Fc0f486F1460e7b7a34;
+
+    //Testnet
+    address public constant GALAXY_CONTRACT_CM = 0x80Bf5dbD599769Eb008a61da6a20a347db35Fd0e;
+    address public constant GALAXY_CONTRACT_RARE = 0x0253Bbd5874f775100BCec873383a2AfdA466273;
+    address public constant GALAXY_CONTRACT_EPIC = 0x36b6eA8bc7E0F4817D3b0212a6797E9b4316eC4C;
 
     mapping(uint256 => address) randomNumberToSender;
     mapping(uint256 => uint256) requestToNFTId;
@@ -922,6 +933,32 @@ contract BoxRedemption is Ownable {
         SWPool[WEAPON][R_BOX][29] = 12;
         SWPool[WEAPON][R_BOX][30] = 13;
         SWPool[WEAPON][R_BOX][31] = 14;
+    }
+
+    function openBoxFromGalaxy(uint _nftType, uint _galaxy_id) public {
+
+        ERC1155Burnable _token;
+        if(_nftType == 0){
+            _token = ERC1155Burnable(GALAXY_CONTRACT_CM);
+        }else if(_nftType == 1){
+            _token = ERC1155Burnable(GALAXY_CONTRACT_RARE);
+        }else if(_nftType == 2){
+            _token = ERC1155Burnable(GALAXY_CONTRACT_EPIC);
+        }
+
+        uint256 _balance = _token.balanceOf(msg.sender, _galaxy_id);
+        require(_balance >= 1, "Your balance is insufficient.");
+
+        uint256 randomNumber = RANDOM_CONTRACT(RANDOM_WORKER_CONTRACT).startRandom();
+        randomNumberToSender[randomNumber] = msg.sender;
+        requestToNFTId[randomNumber] = _nftType;
+        _token.burn(msg.sender, _galaxy_id, 1);
+        
+        string memory partCode = GenerateNFTCode(randomNumber, _nftType);
+
+        mintNFT(randomNumber, partCode);
+
+        emit OpenBox(msg.sender, _nftType, partCode);
     }
 
     function openBox(uint256 _id) public {
