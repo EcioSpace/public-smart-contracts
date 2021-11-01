@@ -76,17 +76,17 @@ contract BoxRedemption is Ownable {
 
     function initialMain() public onlyOwner {
         //NFT Type
-        // NFTPool[CM_BOX][0] = 0;
+        // NFTPool[CM_BOX][0] = 0; //BLUEPRINT_FRAGMENT_COMMON
         // NFTPool[CM_BOX][1] = 0;
         // NFTPool[CM_BOX][2] = 0;
         // NFTPool[CM_BOX][3] = 0;
         // NFTPool[CM_BOX][4] = 0;
         // NFTPool[CM_BOX][5] = 0;
-        NFTPool[CM_BOX][6] = 1;
+        NFTPool[CM_BOX][6] = 1; //BLUEPRINT_FRAGMENT_RARE
         NFTPool[CM_BOX][7] = 1;
         NFTPool[CM_BOX][8] = 1;
         NFTPool[CM_BOX][9] = 1;
-        NFTPool[CM_BOX][10] = 3;
+        NFTPool[CM_BOX][10] = 3; //GENOMIC_FRAGMENT_COMMON
         NFTPool[CM_BOX][11] = 3;
         NFTPool[CM_BOX][12] = 3;
         NFTPool[CM_BOX][13] = 3;
@@ -94,37 +94,37 @@ contract BoxRedemption is Ownable {
         NFTPool[CM_BOX][15] = 3;
         NFTPool[CM_BOX][16] = 3;
         NFTPool[CM_BOX][17] = 3;
-        NFTPool[CM_BOX][18] = 6;
+        NFTPool[CM_BOX][18] = 6; //SPACE_WARRIOR
         NFTPool[CM_BOX][19] = 6;
 
-        // NFTPool[R_BOX][0] = 0;
+        // NFTPool[R_BOX][0] = 0;//BLUEPRINT_FRAGMENT_COMMON
         // NFTPool[R_BOX][1] = 0;
-        NFTPool[R_BOX][2] = 1;
+        NFTPool[R_BOX][2] = 1; //BLUEPRINT_FRAGMENT_RARE
         NFTPool[R_BOX][3] = 1;
-        NFTPool[R_BOX][4] = 2;
-        NFTPool[R_BOX][5] = 3;
+        NFTPool[R_BOX][4] = 2; //BLUEPRINT_FRAGMENT_EPIC
+        NFTPool[R_BOX][5] = 3; //GENOMIC_FRAGMENT_COMMON
         NFTPool[R_BOX][6] = 3;
         NFTPool[R_BOX][7] = 3;
         NFTPool[R_BOX][8] = 3;
-        NFTPool[R_BOX][9] = 4;
+        NFTPool[R_BOX][9] = 4; //GENOMIC_FRAGMENT_RARE
         NFTPool[R_BOX][10] = 4;
         NFTPool[R_BOX][11] = 4;
         NFTPool[R_BOX][12] = 4;
         NFTPool[R_BOX][13] = 4;
         NFTPool[R_BOX][14] = 4;
-        NFTPool[R_BOX][15] = 6;
+        NFTPool[R_BOX][15] = 6; //SPACE_WARRIOR
         NFTPool[R_BOX][16] = 6;
         NFTPool[R_BOX][17] = 6;
         NFTPool[R_BOX][18] = 6;
         NFTPool[R_BOX][19] = 6;
 
-        NFTPool[E_BOX][0] = 2;
+        NFTPool[E_BOX][0] = 2; //BLUEPRINT_FRAGMENT_EPIC
         NFTPool[E_BOX][1] = 2;
-        NFTPool[E_BOX][2] = 4;
+        NFTPool[E_BOX][2] = 4; //GENOMIC_FRAGMENT_RARE
         NFTPool[E_BOX][3] = 4;
-        NFTPool[E_BOX][4] = 5;
-        NFTPool[E_BOX][5] = 5;
-        NFTPool[E_BOX][6] = 6;
+        NFTPool[E_BOX][4] = 5; //GENOMIC_FRAGMENT_EPIC
+        NFTPool[E_BOX][5] = 5; 
+        NFTPool[E_BOX][6] = 6;  //SPACE_WARRIOR
         NFTPool[E_BOX][7] = 6;
         NFTPool[E_BOX][8] = 6;
         NFTPool[E_BOX][9] = 6;
@@ -248,6 +248,31 @@ contract BoxRedemption is Ownable {
         BlueprintPool[R_BOX][RARE][WEAPON][3] = 7;
         BlueprintPool[R_BOX][RARE][WEAPON][4] = 8;
 
+        //Epic
+        BlueprintPool[R_BOX][EPIC][GEAR][0] = 8;
+        BlueprintPool[R_BOX][EPIC][GEAR][1] = 9;
+        BlueprintPool[R_BOX][EPIC][GEAR][2] = 10;
+
+        BlueprintPool[R_BOX][EPIC][DRONE][0] = 8;
+        BlueprintPool[R_BOX][EPIC][DRONE][1] = 9;
+        BlueprintPool[R_BOX][EPIC][DRONE][2] = 10;
+
+        BlueprintPool[R_BOX][EPIC][SUITE][0] = 6;
+        BlueprintPool[R_BOX][EPIC][SUITE][1] = 7;
+        BlueprintPool[R_BOX][EPIC][SUITE][2] = 8;
+        BlueprintPool[R_BOX][EPIC][SUITE][3] = 9;
+
+        BlueprintPool[R_BOX][EPIC][BOT][0] = 8;
+        BlueprintPool[R_BOX][EPIC][BOT][1] = 9;
+        BlueprintPool[R_BOX][EPIC][BOT][2] = 10;
+
+        BlueprintPool[R_BOX][EPIC][WEAPON][0] = 9;
+        BlueprintPool[R_BOX][EPIC][WEAPON][1] = 10;
+        BlueprintPool[R_BOX][EPIC][WEAPON][2] = 11;
+        BlueprintPool[R_BOX][EPIC][WEAPON][3] = 12;
+        BlueprintPool[R_BOX][EPIC][WEAPON][4] = 13;
+        BlueprintPool[R_BOX][EPIC][WEAPON][5] = 14;
+
         GenomicPool[R_BOX][COMMON][0] = 0;
         GenomicPool[R_BOX][COMMON][1] = 1;
         GenomicPool[R_BOX][COMMON][2] = 2;
@@ -288,13 +313,38 @@ contract BoxRedemption is Ownable {
         BlueprintPool[E_BOX][RARE][WEAPON][4] = 13;
         BlueprintPool[E_BOX][RARE][WEAPON][5] = 14;
 
-        GenomicPool[E_BOX][COMMON][0] = 0;
-        GenomicPool[E_BOX][COMMON][1] = 1;
-        GenomicPool[E_BOX][COMMON][2] = 2;
-        GenomicPool[E_BOX][COMMON][3] = 3;
-        GenomicPool[E_BOX][COMMON][4] = 4;
-        GenomicPool[E_BOX][COMMON][5] = 5;
-        GenomicPool[E_BOX][COMMON][6] = 6;
+        //Epic
+        BlueprintPool[E_BOX][EPIC][GEAR][0] = 8;
+        BlueprintPool[E_BOX][EPIC][GEAR][1] = 9;
+        BlueprintPool[E_BOX][EPIC][GEAR][2] = 10;
+
+        BlueprintPool[E_BOX][EPIC][DRONE][0] = 8;
+        BlueprintPool[E_BOX][EPIC][DRONE][1] = 9;
+        BlueprintPool[E_BOX][EPIC][DRONE][2] = 10;
+
+        BlueprintPool[E_BOX][EPIC][SUITE][0] = 6;
+        BlueprintPool[E_BOX][EPIC][SUITE][1] = 7;
+        BlueprintPool[E_BOX][EPIC][SUITE][2] = 8;
+        BlueprintPool[E_BOX][EPIC][SUITE][3] = 9;
+
+        BlueprintPool[E_BOX][EPIC][BOT][0] = 8;
+        BlueprintPool[E_BOX][EPIC][BOT][1] = 9;
+        BlueprintPool[E_BOX][EPIC][BOT][2] = 10;
+
+        BlueprintPool[E_BOX][EPIC][WEAPON][0] = 9;
+        BlueprintPool[E_BOX][EPIC][WEAPON][1] = 10;
+        BlueprintPool[E_BOX][EPIC][WEAPON][2] = 11;
+        BlueprintPool[E_BOX][EPIC][WEAPON][3] = 12;
+        BlueprintPool[E_BOX][EPIC][WEAPON][4] = 13;
+        BlueprintPool[E_BOX][EPIC][WEAPON][5] = 14;
+
+        // GenomicPool[E_BOX][COMMON][0] = 0;
+        // GenomicPool[E_BOX][COMMON][1] = 1;
+        // GenomicPool[E_BOX][COMMON][2] = 2;
+        // GenomicPool[E_BOX][COMMON][3] = 3;
+        // GenomicPool[E_BOX][COMMON][4] = 4;
+        // GenomicPool[E_BOX][COMMON][5] = 5;
+        // GenomicPool[E_BOX][COMMON][6] = 6;
 
         GenomicPool[E_BOX][RARE][0] = 7;
         GenomicPool[E_BOX][RARE][1] = 8;
@@ -316,11 +366,13 @@ contract BoxRedemption is Ownable {
         SWPool[TRANING_CAMP][CM_BOX][2] = 2;
         SWPool[TRANING_CAMP][CM_BOX][3] = 3;
         SWPool[TRANING_CAMP][CM_BOX][4] = 4;
+        
         SWPool[TRANING_CAMP][R_BOX][0] = 0;
         SWPool[TRANING_CAMP][R_BOX][1] = 1;
         SWPool[TRANING_CAMP][R_BOX][2] = 2;
         SWPool[TRANING_CAMP][R_BOX][3] = 3;
         SWPool[TRANING_CAMP][R_BOX][4] = 4;
+
         SWPool[TRANING_CAMP][E_BOX][0] = 0;
         SWPool[TRANING_CAMP][E_BOX][1] = 1;
         SWPool[TRANING_CAMP][E_BOX][2] = 2;
@@ -933,11 +985,8 @@ contract BoxRedemption is Ownable {
     function extactDigit(uint256 _randomNumber)
         internal
         pure
-        returns (
-            Digit memory
-        )
+        returns (Digit memory)
     {
-
         Digit memory digit;
         digit.digit1 = (_randomNumber % 100);
         digit.digit2 = ((_randomNumber % 10000) / 100);
@@ -946,8 +995,7 @@ contract BoxRedemption is Ownable {
         digit.digit5 = ((_randomNumber % 10000000000) / 100000000);
         digit.digit6 = ((_randomNumber % 1000000000000) / 10000000000);
         digit.digit7 = ((_randomNumber % 100000000000000) / 1000000000000);
-        digit.digit8 = ((_randomNumber % 10000000000000000) /
-            100000000000000);
+        digit.digit8 = ((_randomNumber % 10000000000000000) / 100000000000000);
         return digit;
     }
 
@@ -970,11 +1018,32 @@ contract BoxRedemption is Ownable {
 
             uint256 equipmemtTypeId = EquipmentPool[equipmemtRandom];
 
-            if (equipmemtTypeId == SUITE) {
-                equipmemtRandom = GetRandomNumberWithMod(_randomNumber, 2, 3);
-            } else {
-                equipmemtRandom = GetRandomNumberWithMod(_randomNumber, 2, 4);
+            uint256 maxRandom;
+            if (_id == CM_BOX || _id == R_BOX) {
+                if (equipmemtTypeId == SUITE) {
+                    maxRandom = 3;
+                } else {
+                    maxRandom = 4;
+                }
+            } else if (_id == E_BOX) {
+                if (
+                    equipmemtTypeId == GEAR ||
+                    equipmemtTypeId == DRONE ||
+                    equipmemtTypeId == BOT
+                ) {
+                    maxRandom = 3;
+                } else if (equipmemtTypeId == SUITE) {
+                    maxRandom = 4;
+                } else if (equipmemtTypeId == WEAPON) {
+                    maxRandom = 6;
+                }
             }
+
+            equipmemtRandom = GetRandomNumberWithMod(
+                _randomNumber,
+                2,
+                maxRandom
+            );
 
             uint256 equipmemtPartId = BlueprintPool[_id][COMMON][
                 equipmemtTypeId
@@ -993,10 +1062,31 @@ contract BoxRedemption is Ownable {
 
             uint256 equipmemtTypeId = EquipmentPool[equipmemtRandom];
 
-            if (equipmemtTypeId == WEAPON) {
-                equipmemtRandom = GetRandomNumberWithMod(_randomNumber, 2, 4);
-            } else {
-                equipmemtRandom = GetRandomNumberWithMod(_randomNumber, 2, 3);
+            uint256 maxRandom;
+            if (_id == CM_BOX) {
+                if (equipmemtTypeId == WEAPON) {
+                    maxRandom = 4;
+                } else {
+                    maxRandom = 3;
+                }
+            } else if (_id == R_BOX) {
+                if (equipmemtTypeId == WEAPON) {
+                    maxRandom = 5;
+                } else {
+                    maxRandom = 3;
+                }
+            } else if (_id == E_BOX) {
+                if (
+                    equipmemtTypeId == GEAR ||
+                    equipmemtTypeId == DRONE ||
+                    equipmemtTypeId == BOT
+                ) {
+                    maxRandom = 3;
+                } else if (equipmemtTypeId == SUITE) {
+                    maxRandom = 4;
+                } else if (equipmemtTypeId == WEAPON) {
+                    maxRandom = 6;
+                }
             }
 
             uint256 equipmemtPartId = BlueprintPool[_id][RARE][equipmemtTypeId][
@@ -1016,11 +1106,20 @@ contract BoxRedemption is Ownable {
 
             uint256 equipmemtTypeId = EquipmentPool[equipmemtRandom];
 
-            if (equipmemtTypeId == WEAPON) {
-                equipmemtRandom = GetRandomNumberWithMod(_randomNumber, 2, 4);
-            } else {
-                equipmemtRandom = GetRandomNumberWithMod(_randomNumber, 2, 3);
-            }
+            uint256 maxRandom;
+            if (_id == R_BOX || _id == E_BOX) {
+                if (
+                    equipmemtTypeId == GEAR ||
+                    equipmemtTypeId == DRONE ||
+                    equipmemtTypeId == BOT
+                ) {
+                    maxRandom = 3;
+                } else if (equipmemtTypeId == SUITE) {
+                    maxRandom = 4;
+                } else if (equipmemtTypeId == WEAPON) {
+                    maxRandom = 6;
+                }
+            } 
 
             uint256 equipmemtPartId = BlueprintPool[_id][EPIC][equipmemtTypeId][
                 equipmemtRandom
@@ -1031,6 +1130,7 @@ contract BoxRedemption is Ownable {
                 equipmemtPartId
             );
         } else if (nftTypeCode == GENOMIC_FRAGMENT_COMMON) {
+
             uint256 number = GetRandomNumberWithMod(_randomNumber, 2, 7);
             uint256 genomicFragmentType = GenomicPool[_id][COMMON][number];
             partCode = createPartCode(
@@ -1047,7 +1147,8 @@ contract BoxRedemption is Ownable {
                 nftTypeCode
             );
         } else if (nftTypeCode == GENOMIC_FRAGMENT_RARE) {
-            uint256 number = GetRandomNumberWithMod(_randomNumber, 2, 7);
+          
+            uint256 number = GetRandomNumberWithMod(_randomNumber, 2, 6);
             uint256 genomicFragmentType = GenomicPool[_id][RARE][number];
             partCode = createPartCode(
                 0,
@@ -1063,7 +1164,7 @@ contract BoxRedemption is Ownable {
                 nftTypeCode
             );
         } else if (nftTypeCode == GENOMIC_FRAGMENT_EPIC) {
-            uint256 number = GetRandomNumberWithMod(_randomNumber, 2, 7);
+            uint256 number = GetRandomNumberWithMod(_randomNumber, 2, 4);
             uint256 genomicFragmentType = GenomicPool[_id][EPIC][number];
             partCode = createPartCode(
                 0,
@@ -1124,15 +1225,15 @@ contract BoxRedemption is Ownable {
             trainingCode = digit.digit2 % 5;
             battleGearCode = digit.digit3 % 30;
             battleDroneCode = digit.digit4 % 30;
-            battleSuiteCode = digit.digit5 % 19;
+            battleSuiteCode = digit.digit5 % 17;
             battleBotCode = digit.digit6 % 30;
             humanGenomeCode = digit.digit7 % 25;
             weaponCode = digit.digit8 % 34;
         } else if (_id == E_BOX) {
-            trainingCode = digit.digit2 % 30;
+            trainingCode = digit.digit2 % 5;
             battleGearCode = digit.digit3 % 30;
             battleDroneCode = digit.digit4 % 30;
-            battleSuiteCode = digit.digit5 % 17;
+            battleSuiteCode = digit.digit5 % 19;
             battleBotCode = digit.digit6 % 30;
             humanGenomeCode = digit.digit7 % 29;
             weaponCode = digit.digit8 % 32;
