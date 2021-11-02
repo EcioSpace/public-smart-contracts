@@ -110,14 +110,17 @@ contract BoxRedemption is Ownable {
         NFTPool[COMMON][7] = 1;
         NFTPool[COMMON][8] = 1;
         NFTPool[COMMON][9] = 1;
-        NFTPool[COMMON][10] = 3; //GENOMIC_COMMON
-        NFTPool[COMMON][11] = 3;
-        NFTPool[COMMON][12] = 3;
-        NFTPool[COMMON][13] = 3;
-        NFTPool[COMMON][14] = 3;
-        NFTPool[COMMON][15] = 3;
-        NFTPool[COMMON][16] = 3;
-        NFTPool[COMMON][17] = 3;
+        for (uint256 i = 10; i <=17; i++) {
+             NFTPool[COMMON][i] = 3;
+        }
+        // NFTPool[COMMON][10] = 3; //GENOMIC_COMMON
+        // NFTPool[COMMON][11] = 3;
+        // NFTPool[COMMON][12] = 3;
+        // NFTPool[COMMON][13] = 3;
+        // NFTPool[COMMON][14] = 3;
+        // NFTPool[COMMON][15] = 3;
+        // NFTPool[COMMON][16] = 3;
+        // NFTPool[COMMON][17] = 3;
         NFTPool[COMMON][18] = 6; //SPACE_WARRIOR
         NFTPool[COMMON][19] = 6;
 
