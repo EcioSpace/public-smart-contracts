@@ -1210,18 +1210,10 @@ contract BoxRedemption is Ownable {
             battleSuite = d.digit5 % 19;
             humanGEN = d.digit7 % 29;
             WEAPCode = d.digit8 % 32;
-        }
-
-        // WEAPCode = SWPool[WEAP][_id][WEAPCode];
-        // humanGEN = SWPool[GEN][_id][humanGEN]; //humanGENCode
-        // battleBot = SWPool[BOT][_id][battleBot]; //battleBotCode
-        // battleSuite = SWPool[SUITE][_id][battleSuite]; //battleSuiteCode
-        // battleDrone = SWPool[DRO][_id][battleDrone]; //battleDROCode
-        // battleGear = SWPool[GEAR][_id][battleGear]; //battleGearCode
-        // training = SWPool[TRANING_CAMP][_id][training]; //trainingCode
-
+        } 
+        
         string memory concatedCode = convertCodeToStr(6);
-        concatedCode = concateCode(concatedCode, 0);
+        concatedCode = concateCode(concatedCode, 0); //kingdomCode
         concatedCode = concateCode(
             concatedCode,
             SWPool[TRANING_CAMP][_id][training]
@@ -1235,10 +1227,10 @@ contract BoxRedemption is Ownable {
         concatedCode = concateCode(concatedCode, SWPool[BOT][_id][battleBot]);
         concatedCode = concateCode(concatedCode, SWPool[GEN][_id][humanGEN]);
         concatedCode = concateCode(concatedCode, SWPool[WEAP][_id][WEAPCode]);
-        concatedCode = concateCode(concatedCode, 0);
-        concatedCode = concateCode(concatedCode, 0);
-        // concatedCode = concateCode(concatedCode, 0); //Reserved
-        // concatedCode = concateCode(concatedCode, 0); //Reserved
+        concatedCode = concateCode(concatedCode, 0); //Star
+        concatedCode = concateCode(concatedCode, 0); //equipmentCode
+        concatedCode = concateCode(concatedCode, 0); //Reserved
+        concatedCode = concateCode(concatedCode, 0); //Reserved
         return concatedCode;
     }
 
@@ -1332,7 +1324,7 @@ contract BoxRedemption is Ownable {
     function createPartCode(
         uint256 equipmentCode,
         uint256 starCode,
-        uint256 WEAPCode,
+        uint256 weapCode,
         uint256 humanGENCode,
         uint256 battleBotCode,
         uint256 battleSuiteCode,
@@ -1350,11 +1342,11 @@ contract BoxRedemption is Ownable {
         code = concateCode(code, battleSuiteCode);
         code = concateCode(code, battleBotCode);
         code = concateCode(code, humanGENCode);
-        code = concateCode(code, WEAPCode);
+        code = concateCode(code, weapCode);
         code = concateCode(code, starCode);
         code = concateCode(code, equipmentCode); //Reserved
-        // concatedCode = concateCode(concatedCode, 0); //Reserved
-        // concatedCode = concateCode(concatedCode, 0); //Reserved
+        code = concateCode(code, 0); //Reserved
+        code = concateCode(code, 0); //Reserved
         return code;
     }
 

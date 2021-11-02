@@ -1,18 +1,4 @@
 # ECIO Space - Public Smart Contracts
-## Pre-Sale
-To support our community, we separate 75M tokens out of IDO pool to offer direct sale to our early community with a discount rate of 50%. Hence, the presale offer will be 0.004 BUSD per 1 ECIO.
-The qualifications for Presale participants will be categorized in 3 groups:
-- Top 500 earliest whitelist registration
-- Top 500 unique referral users within 6 days
-- Lucky draw of 1,000 addresses 
-
-Group 1 and Group 2 will be guaranteed to buy with a limit of 50,000 $ECIO per user. 
-Group 3 will not be guaranteed to buy. The maximum purchase per user is limited to 50,000 $ECIO per user.
-#### Smart Contract Address: - (Under Testing)
-#### BSC Scan : - (Under Testing)
-#### Source code: [Presales.sol](contracts/Presales.sol)
-
-
 ## Token
 
 ### ECIO Token
@@ -35,3 +21,41 @@ Luminous gemstones is recognized by many stars as a valuable thing that is hard 
 
 
 Readmore whitepapre: https://ecio-space.gitbook.io
+
+
+Testnet Address
+ERC1155
+0xfB684dC65DE6C27c63fa7a00B9b9fB70d2125Ea1
+
+ERC721
+0x64F6bcDb65faC6339e89ad3A8bf2317C7CE8D5aE
+
+
+
+abigen --bin=abigenBindings/bin/ECIONFTCore.bin --abi=abigenBindings/abi/ECIONFTCore.abi --pkg=abi --out=ECIONFTCore.go
+
+
+
+
+title ECIO Random Process
+
+RandomCaller->RandomProxy: randomnessRequest(_seed)
+RandomProxy->RandomWorker: randomnessRequest(_seed)
+
+alt Frist Time
+	RandomWorker->Chainlink: randomnessRequest(_seed)
+    Chainlink->RandomWorker: reqId,result := fulfillRandomness()
+    RandomWorker->RandomWorker: _randomNumber := Random2nd(result[0])
+    RandomWorker->RandomWorker: fulfillRandomness()
+else Reuse
+	RandomWorker->RandomWorker: _randomNumber := Random2nd(result[count])
+end
+
+RandomWorker->RandomProxy: _randomNumber
+RandomProxy->RandomCaller: _randomNumber
+
+
+
+
+Random Worker
+https://testnet.bscscan.com/address/0x5abf279b87f84c916d0f34c2dafc949f86ffb887
