@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.2;
-
-// import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
-// import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-// import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 interface ERC1155_CONTRACT {
@@ -53,25 +49,33 @@ contract BoxRedemption is Ownable {
     uint8 private constant RARE = 1;
     uint8 private constant EPIC = 2;
 
-    //Testnet
+    // //Testnet
+    // address public constant MISTORY_BOX_CONTRACT =
+    //     0xfB684dC65DE6C27c63fa7a00B9b9fB70d2125Ea1;
+    // address public constant ECIO_NFT_CORE_CONTRACT =
+    //     0x7E8eEe5be55A589d5571Be7176172f4DEE7f47aF;
+    // address public constant RANDOM_WORKER_CONTRACT =
+    //     0x5ABF279B87F84C916d0f34c2dafc949f86ffb887;
+
+      //Main
     address public constant MISTORY_BOX_CONTRACT =
-        0xfB684dC65DE6C27c63fa7a00B9b9fB70d2125Ea1;
+        0x1ddCD5B73afb734b4AE6B1C139858F36311Ed4d3;
     address public constant ECIO_NFT_CORE_CONTRACT =
-        0x7E8eEe5be55A589d5571Be7176172f4DEE7f47aF;
+        0x328Bac8C81A947094f34651e6B0e548EBe35796B;
     address public constant RANDOM_WORKER_CONTRACT =
-        0x5ABF279B87F84C916d0f34c2dafc949f86ffb887;
+        0xa17Dc043C68B7714B6D0847ab45F1cE73fc05Bca;
 
     //Mainnet
-    // address public constant GALAXY_CONTRACT_CM = 0xaae9f9d4fb8748feba405cE25856DC57C91BbB92;
-    // address public constant GALAXY_CONTRACT_RARE = 0xc04581BEA69A9C781532A17169C59980F4faC757;
-    // address public constant GALAXY_CONTRACT_EPIC = 0x9C90ba4C8834e92A771e4Fc0f486F1460e7b7a34;
+    address public constant GAX_CM = 0xaae9f9d4fb8748feba405cE25856DC57C91BbB92;
+    address public constant GAX_RARE = 0xc04581BEA69A9C781532A17169C59980F4faC757;
+    address public constant GAX_EPIC = 0x9C90ba4C8834e92A771e4Fc0f486F1460e7b7a34;
 
     //Testnet
-    address public constant GAX_CM = 0x80Bf5dbD599769Eb008a61da6a20a347db35Fd0e;
-    address public constant GAX_RARE =
-        0x0253Bbd5874f775100BCec873383a2AfdA466273;
-    address public constant GAX_EPIC =
-        0x36b6eA8bc7E0F4817D3b0212a6797E9b4316eC4C;
+    // address public constant GAX_CM = 0x80Bf5dbD599769Eb008a61da6a20a347db35Fd0e;
+    // address public constant GAX_RARE =
+    //     0x0253Bbd5874f775100BCec873383a2AfdA466273;
+    // address public constant GAX_EPIC =
+    //     0x36b6eA8bc7E0F4817D3b0212a6797E9b4316eC4C;
 
     mapping(uint256 => address) ranNumToSender;
     mapping(uint256 => uint256) requestToNFTId;
@@ -139,11 +143,14 @@ contract BoxRedemption is Ownable {
         NFTPool[RARE][12] = 4;
         NFTPool[RARE][13] = 4;
         NFTPool[RARE][14] = 4;
-        NFTPool[RARE][15] = 6; //SPACE_WARRIOR
-        NFTPool[RARE][16] = 6;
-        NFTPool[RARE][17] = 6;
-        NFTPool[RARE][18] = 6;
-        NFTPool[RARE][19] = 6;
+        for (uint256 i = 15; i <=19; i++) {
+           NFTPool[RARE][i] = 6;
+        }
+        // NFTPool[RARE][15] = 6; //SPACE_WARRIOR
+        // NFTPool[RARE][16] = 6;
+        // NFTPool[RARE][17] = 6;
+        // NFTPool[RARE][18] = 6;
+        // NFTPool[RARE][19] = 6;
 
         NFTPool[EPIC][0] = 2; //BLUEPRINT_EPIC
         NFTPool[EPIC][1] = 2;
@@ -534,10 +541,13 @@ contract BoxRedemption is Ownable {
         SWPool[GEN][COMMON][5] = 1;
         SWPool[GEN][COMMON][6] = 1;
         SWPool[GEN][COMMON][7] = 1;
-        SWPool[GEN][COMMON][8] = 2;
-        SWPool[GEN][COMMON][9] = 2;
-        SWPool[GEN][COMMON][10] = 2;
-        SWPool[GEN][COMMON][11] = 2;
+         for (uint256 i = 8; i <=11; i++) {
+           SWPool[GEN][COMMON][i] = 2;
+        }
+        // SWPool[GEN][COMMON][8] = 2;
+        // SWPool[GEN][COMMON][9] = 2;
+        // SWPool[GEN][COMMON][10] = 2;
+        // SWPool[GEN][COMMON][11] = 2;
         SWPool[GEN][COMMON][12] = 3;
         SWPool[GEN][COMMON][13] = 3;
         SWPool[GEN][COMMON][14] = 3;
@@ -562,24 +572,33 @@ contract BoxRedemption is Ownable {
         // SWPool[WEAP][COMMON][3] = 0;
         // SWPool[WEAP][COMMON][4] = 0;
         // SWPool[WEAP][COMMON][5] = 0;
-        SWPool[WEAP][COMMON][6] = 1;
-        SWPool[WEAP][COMMON][7] = 1;
-        SWPool[WEAP][COMMON][8] = 1;
-        SWPool[WEAP][COMMON][9] = 1;
-        SWPool[WEAP][COMMON][10] = 1;
-        SWPool[WEAP][COMMON][11] = 1;
-        SWPool[WEAP][COMMON][12] = 2;
-        SWPool[WEAP][COMMON][13] = 2;
-        SWPool[WEAP][COMMON][14] = 2;
-        SWPool[WEAP][COMMON][15] = 2;
-        SWPool[WEAP][COMMON][16] = 2;
-        SWPool[WEAP][COMMON][17] = 2;
-        SWPool[WEAP][COMMON][18] = 3;
-        SWPool[WEAP][COMMON][19] = 3;
-        SWPool[WEAP][COMMON][20] = 3;
-        SWPool[WEAP][COMMON][21] = 3;
-        SWPool[WEAP][COMMON][22] = 3;
-        SWPool[WEAP][COMMON][23] = 3;
+        for (uint256 i = 6; i <=11; i++) {
+             SWPool[WEAP][COMMON][i] = 1;
+        }
+        // SWPool[WEAP][COMMON][6] = 1;
+        // SWPool[WEAP][COMMON][7] = 1;
+        // SWPool[WEAP][COMMON][8] = 1;
+        // SWPool[WEAP][COMMON][9] = 1;
+        // SWPool[WEAP][COMMON][10] = 1;
+        // SWPool[WEAP][COMMON][11] = 1;
+           for (uint256 i = 12; i <=17; i++) {
+            SWPool[WEAP][COMMON][i] = 2;
+        }
+        // SWPool[WEAP][COMMON][12] = 2;
+        // SWPool[WEAP][COMMON][13] = 2;
+        // SWPool[WEAP][COMMON][14] = 2;
+        // SWPool[WEAP][COMMON][15] = 2;
+        // SWPool[WEAP][COMMON][16] = 2;
+        // SWPool[WEAP][COMMON][17] = 2;
+        for (uint256 i = 18; i <=23; i++) {
+            SWPool[WEAP][COMMON][i] = 3;
+        }
+        // SWPool[WEAP][COMMON][18] = 3;
+        // SWPool[WEAP][COMMON][19] = 3;
+        // SWPool[WEAP][COMMON][20] = 3;
+        // SWPool[WEAP][COMMON][21] = 3;
+        // SWPool[WEAP][COMMON][22] = 3;
+        // SWPool[WEAP][COMMON][23] = 3;
         SWPool[WEAP][COMMON][24] = 4;
         SWPool[WEAP][COMMON][25] = 5;
         SWPool[WEAP][COMMON][26] = 6;
@@ -737,12 +756,15 @@ contract BoxRedemption is Ownable {
         // SWPool[WEAP][RARE][2] = 0;
         // SWPool[WEAP][RARE][3] = 0;
         // SWPool[WEAP][RARE][4] = 0;
-        SWPool[WEAP][RARE][5] = 1;
-        SWPool[WEAP][RARE][6] = 1;
-        SWPool[WEAP][RARE][7] = 1;
-        SWPool[WEAP][RARE][8] = 1;
-        SWPool[WEAP][RARE][9] = 1;
-        SWPool[WEAP][RARE][10] = 1;
+        for (uint256 i = 5; i <=10; i++) {
+            SWPool[WEAP][RARE][i] = 1;
+        }
+        // SWPool[WEAP][RARE][5] = 1;
+        // SWPool[WEAP][RARE][6] = 1;
+        // SWPool[WEAP][RARE][7] = 1;
+        // SWPool[WEAP][RARE][8] = 1;
+        // SWPool[WEAP][RARE][9] = 1;
+        // SWPool[WEAP][RARE][10] = 1;
         SWPool[WEAP][RARE][11] = 2;
         SWPool[WEAP][RARE][12] = 2;
         SWPool[WEAP][RARE][13] = 2;
