@@ -15,10 +15,8 @@ contract Presales is Ownable {
     uint256 private constant MAXIMUM_BUSD_PER_ACCOUNT  = 200000000000000000000;
     
     //BUSD token address.
-    address private constant BUSD_TOKEN_ADDRESS =  0x2B2E131937845454b57920604977E0aBf43be58D;
-   // address private constant BUSD_TOKEN_ADDRESS = 0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee; //Testnet
-    //address private constant BUSD_TOKEN_ADDRESS = 0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56; //Maintest
-    
+    address public busdTokenAddress;
+  
     //lotsStartTime is start timestamp of each pre-sale lot.
     mapping(uint => uint) public lotsStartTime;
     
@@ -27,6 +25,9 @@ contract Presales is Ownable {
 
     //lotsTokenPool is total token of each pre-sale lot.
     mapping(uint => uint) public lotsTokenPool;
+
+    //lotsToken
+    mapping(uint => uint) public lotsToken;
     
     //accountBalances is user's balances BUSD Token.
     mapping(address => uint) public accountBalances;
@@ -37,6 +38,9 @@ contract Presales is Ownable {
     //lot's balances.
     mapping(uint => uint) public lotsBalances;
    
+   //lotsAccountCount
+    mapping(uint => uint) public lotsAccountCount;
+
    //BuyPresale Event
     event BuyPresale(address indexed _from, uint _amount);
    
@@ -49,12 +53,47 @@ contract Presales is Ownable {
     
     //Validate start and end timestamp to allow users to access buying function.
     modifier isPresaleOpen(address _account){
-        
        uint _lotId = accountLotId[_account];
        require(lotsStartTime[_lotId] !=0 && lotsEndTime[_lotId] !=0 ,"Pre-sale hasn't started.");
-       require(lotsStartTime[_lotId] <= block.timestamp,"Pre-sale hasn't started.");
-       require(lotsEndTime[_lotId] >= block.timestamp,"Pre-sale has closed.");
+       require(lotsStartTime[_lotId] <= timeNow(), "Pre-sale hasn't started.");
+       require(lotsEndTime[_lotId] >= timeNow(), "Pre-sale has closed.");
         _;
+    }
+
+    uint private timestamp;
+    function setTimeNow(uint _timestamp) public onlyOwner{
+        timestamp = _timestamp;
+    }
+
+    function timeNow() internal view returns(uint){
+        if(timestamp != 0){
+            return timestamp;
+        }
+        return block.timestamp;
+    }
+
+    function setBUSDTokenAddress(address _address) public onlyOwner{
+        busdTokenAddress = _address;
+    }
+
+    function canAccessPresale(address _account) public view returns(uint){
+        
+        uint _lotId = accountLotId[_account];
+
+        if(_lotId == 0){
+            return 0;
+        }
+
+        require(lotsStartTime[_lotId] !=0 && lotsEndTime[_lotId] !=0 ,"Pre-sale hasn't started.");
+
+        if (timeNow() >= lotsStartTime[_lotId] && timeNow() <= lotsEndTime[_lotId]){
+            //Opened
+            return 2;
+        }else{
+
+            //Waiting Open
+            return 1;
+        }
     }
 
     /**
@@ -64,17 +103,25 @@ contract Presales is Ownable {
         return lotsTokenPool[_lotId];
     }
 
- 
+
+    function tokenPerLot(uint _lotId) public view returns(uint) {
+        return lotsToken[_lotId];
+    }
+
+
+
     /**
     * @dev SetPresaleTime is function for setup pre-sale's timestamp.
     * @param _lotId lotId of pre-sale
     * @param _startTime start timestamp
     * @param _endTime end timestamp
+    * @param _tokenPool number of token in lot
     */
     function setPresaleTime(uint _lotId, uint _startTime, uint _endTime, uint _tokenPool) external onlyOwner {
         lotsStartTime[_lotId] = _startTime;
         lotsEndTime[_lotId]   = _endTime;
         lotsTokenPool[_lotId] = _tokenPool;
+        lotsToken[_lotId] = _tokenPool;
     }
     
     function moveTokenPoolFromLoT1Lot2ToLot3() public onlyOwner{
@@ -86,9 +133,10 @@ contract Presales is Ownable {
     * @dev ImportWhitelist is function for manually import addresses that are allowed to buying. 
     */
     function importWhitelist(address[] memory _accounts, uint[] memory _lotIds) public onlyOwner {
-        for(uint256 i = 0; i < _accounts.length; ++i){
+        for(uint256 i = 0; i < _accounts.length; i++){
             accountLotId[_accounts[i]] = _lotIds[i];
             accountBalances[_accounts[i]] = 0;
+            lotsAccountCount[_lotIds[i]] = lotsAccountCount[_lotIds[i]] + 1;
         }
     }
 
@@ -136,7 +184,7 @@ contract Presales is Ownable {
        
         require(_amount > 0, "Your amount is too small.");
 
-        IERC20 _token = IERC20(BUSD_TOKEN_ADDRESS);
+        IERC20 _token = IERC20(busdTokenAddress);
         uint _balance = _token.balanceOf(msg.sender);
         require(_balance >= _amount, "Your balance is insufficient.");
 
@@ -180,6 +228,5 @@ contract Presales is Ownable {
         IERC20 _token = IERC20(_contractAddress);
         _token.transfer(_to, _amount);
     }
-
 
 }
