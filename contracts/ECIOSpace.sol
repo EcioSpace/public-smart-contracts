@@ -5,7 +5,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20Burnable
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-contract ECIOSpace is Initializable, ERC20Upgradeable, ERC20BurnableUpgradeable, PausableUpgradeable, AccessControlUpgradeable {
+contract EcioSpace is Initializable, ERC20Upgradeable, ERC20BurnableUpgradeable, PausableUpgradeable, AccessControlUpgradeable {
     
     uint256 private constant TOTAL_SUPPLY = 7000 * 10**(6 + 18); // 7000M tokens
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");

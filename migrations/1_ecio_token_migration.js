@@ -1,5 +1,5 @@
-const ECIOSpace = artifacts.require("ECIOSpace");
+const EcioSpace = artifacts.require("EcioSpace");
 
 module.exports = function (deployer) {
-  deployer.deploy(ECIOSpace);
+  deployer.deploy(EcioSpace);
 };
