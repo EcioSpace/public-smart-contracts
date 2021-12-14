@@ -13,7 +13,7 @@ interface IBPContract {
     ) external;
 }
 
-contract EcioSpaceToken is ERC20, ERC20Burnable, AccessControl {
+contract EcioSpace is ERC20, ERC20Burnable, AccessControl {
 
     uint256 private constant TOTAL_SUPPLY = 7000 * 10**(6 + 18); // 7000M tokens
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
